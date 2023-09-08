@@ -1,5 +1,5 @@
 
-SET(mdml_cgi_sources main.cpp)
+set(MDML__CGI_SOURCES main.cpp)
 
-add_executable(mdml-cgi ${mdml_cgi_sources})
-target_link_libraries(mdml-cgi PRIVATE mdml)
+add_executable(mdml-cgi ${MDML__CGI_SOURCES})
+target_link_libraries(mdml-cgi PUBLIC mdml)

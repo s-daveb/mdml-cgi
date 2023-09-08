@@ -6,9 +6,9 @@ endif()
 
 if (NOT DEFINED PROJECT_NAME)
 	set(NOT_SUBPROJECT ON)
-else
+else()
 	set(NOT_SUBPROJECT OFF)
-endif(NOT DEFINED PROJECT_NAME)
+endif()
 
 project(mdml
 	VERSION 0.1
@@ -42,6 +42,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(maddy)
 FetchContent_MakeAvailable(Catch2)
 
+
 CHECK_INCLUDE_FILE("execinfo.h" HAVE_EXECINFO_H)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/artifacts/bin)
@@ -52,5 +53,5 @@ add_subdirectory(src)
 add_subdirectory(apps)
 
 if (NOT_SUBPROJECT)
-add_subdirectory(tests)
+	add_subdirectory(tests)
 endif(NOT_SUBPROJECT)
