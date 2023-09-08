@@ -5,8 +5,10 @@ if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
 endif()
 
 if (NOT DEFINED PROJECT_NAME)
-	enable_testing()
-endif()
+	set(NOT_SUBPROJECT ON)
+else
+	set(NOT_SUBPROJECT OFF)
+endif(NOT DEFINED PROJECT_NAME)
 
 project(mdml
 	VERSION 0.1
@@ -14,6 +16,14 @@ project(mdml
 	# HOMEPAGE_URL
 	DESCRIPTION "A CGI script written in C++ that converts markdown to HTML"
 )
+
+find_program(CCACHE_PATH ccache)
+if(CCACHE_PATH)
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CCACHE_PATH})
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ${CCACHE_PATH})
+endif(CCACHE_PATH)
+
+
 include(FetchContent)
 include(CheckIncludeFile)
 
@@ -40,5 +50,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/artifacts/lib)
 
 add_subdirectory(src)
 add_subdirectory(apps)
-add_subdirectory(tests)
 
+if (NOT_SUBPROJECT)
+add_subdirectory(tests)
+endif(NOT_SUBPROJECT)
