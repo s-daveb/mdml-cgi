@@ -28,9 +28,9 @@ include(FetchContent)
 include(CheckIncludeFile)
 
 FetchContent_Declare(
-   	maddy
-	URL https://github.com/progsource/maddy/releases/download/1.3.0/maddy-src.zip
-	URL_HASH MD5=a29ddce16c2437ec9fac2441c7daa806
+   	cmark
+	URL https://github.com/commonmark/cmark/archive/refs/tags/0.30.3.zip
+	URL_HASH MD5=e806e6430ea49540f512ab98f32d4e2c
 )
 
 FetchContent_Declare(
@@ -39,7 +39,15 @@ FetchContent_Declare(
 	URL_HASH MD5=c426e77d4ee0055410bc930182959ae5
 )
 
-FetchContent_MakeAvailable(maddy)
+
+FetchContent_GetProperties(cmark)
+if (NOT cmark_POPULATED)
+	if (CMARK_TESTS)
+		set(CMARK_TESTS OFF)
+	endif()
+	set(CMARK_SHARED ON)
+	FetchContent_Populate(cmark)
+endif()
 FetchContent_MakeAvailable(Catch2)
 
 
@@ -59,15 +67,13 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
 	set(custom_rel_flags "-Os")
 
-    set(
-		CMAKE_C_FLAGS_RELEASE
-		"${CMAKE_C_FLAGS_RELEASE} ${custom_rel_flags}"
-	)
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${custom_rel_flags}")
     set(
 		CMAKE_CXX_FLAGS_RELEASE
 		"${CMAKE_CXX_FLAGS_RELEASE} ${custom_rel_flags}"
 	)
 endif()
+
 
 add_subdirectory(src)
 add_subdirectory(apps)
