@@ -9,10 +9,10 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#define TEST(testname) TEST_CASE(#testname, TEST_SUITE_NAME)
+#define TEST(testname) TEST_CASE(testname, TEST_SUITE_NAME)
 
 namespace {
-	const char* TEST_SUITE_NAME = "[mdml::exceptions]";
+	const char* TEST_SUITE_NAME = "mdml::exceptions";
 
 	// @todo: move this to a runtime-test.cpp file
 	TEST("Test the test framework")
