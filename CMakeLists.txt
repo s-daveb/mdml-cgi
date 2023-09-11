@@ -49,6 +49,26 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/artifacts/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/artifacts/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/artifacts/lib)
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	set(custom_dbg_flags "-O0 -ggdb")
+
+    # Custom flags for Debug configuration
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${custom_dbg_flags}")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${custom_dbg_flags}")
+
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+	set(custom_rel_flags "-Os")
+
+    set(
+		CMAKE_C_FLAGS_RELEASE
+		"${CMAKE_C_FLAGS_RELEASE} ${custom_rel_flags}"
+	)
+    set(
+		CMAKE_CXX_FLAGS_RELEASE
+		"${CMAKE_CXX_FLAGS_RELEASE} ${custom_rel_flags}"
+	)
+endif()
+
 add_subdirectory(src)
 add_subdirectory(apps)
 
