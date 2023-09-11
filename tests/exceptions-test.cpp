@@ -12,10 +12,11 @@
 #define TEST(testname) TEST_CASE(#testname, TEST_SUITE_NAME)
 
 namespace {
-	const char* TEST_SUITE_NAME = "[class:Observable]";
+	const char* TEST_SUITE_NAME = "[mdml::exceptions]";
 
-	TEST("Register IObservers")
+	// @todo: move this to a runtime-test.cpp file
+	TEST("Test the test framework")
 	{
-		REQUIRE( true == false );
+		REQUIRE( true == true );
 	} // #endregion
 }
