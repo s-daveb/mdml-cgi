@@ -12,7 +12,7 @@ endif()
 
 project(mdml
 	VERSION 0.1
-	LANGUAGES CXX
+	LANGUAGES C CXX
 	# HOMEPAGE_URL
 	DESCRIPTION "A CGI script written in C++ that converts markdown to HTML"
 )
@@ -40,13 +40,33 @@ FetchContent_Declare(
 )
 
 
+# Instead of calling FetchContent_MakeAvailable, using a more manual way
+# to import cmark's build targets.    The official cmark repo builds unit
+# tests by default, which we don't need here. It also uses deprecated FindPython
+# modules that cause the build to spit out warnings.
+
+# Import the build variables from cmark
 FetchContent_GetProperties(cmark)
-if (NOT cmark_POPULATED)
-	if (CMARK_TESTS)
-		set(CMARK_TESTS OFF)
-	endif()
-	set(CMARK_SHARED ON)
-	FetchContent_Populate(cmark)
+
+# cmark's cmake uses very deprecated functions for unit tests, and hence
+# cannot be imported with FetchContent_MakeAvailable.  A different process
+# has to be used to disable the broken build targets. 
+if (NOT cmark_POPULATED)            # if build targets not populated
+
+	# Since these properties are /options/ of cmark, they need to be overriden
+	# at the CmakeCache.txt level, hence the CACHE INTERNAL keywords
+
+	# Enable shared lib and static lib build for flexibility
+	set(CMARK_SHARED ON CACHE INTERNAL "Turn on shared lib")
+	set(CMARK_STATIC ON CACHE INTERNAL "Turn on static lib")
+
+	#  disable cmark unit tests that use deprecated features.
+	set(CMARK_TESTS OFF CACHE INTERNAL "Turn off tests")
+
+
+	FetchContent_Populate(cmark)    # populate remaining build targets
+	# Add cmark build targets to this project
+	add_subdirectory(${cmark_SOURCE_DIR} ${cmark_BINARY_DIR})
 endif()
 FetchContent_MakeAvailable(Catch2)
 
