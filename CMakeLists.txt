@@ -15,22 +15,22 @@ project(mdml
 	LANGUAGES C CXX
 	# HOMEPAGE_URL
 	DESCRIPTION "A CGI script written in C++ that converts markdown to HTML"
-	)
-
+)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# @{ Nice-to-haves, ccache and compile_commands.json for clangd 
 find_program(CCACHE_PATH ccache)
 if(CCACHE_PATH)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CCACHE_PATH})
     set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ${CCACHE_PATH})
 endif(CCACHE_PATH)
 
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS On)
+# @}
 
 include(FetchContent)
 include(CheckIncludeFile)
@@ -50,9 +50,10 @@ FetchContent_Declare(
 # @}
 
 FetchContent_MakeAvailable(Catch2)
-# Just kidding!
+
+# FetchContent: cmark @{
 # Instead of calling FetchContent_MakeAvailable, use a more manual way
-# to import cmark's build targets.https
+# to import cmark's build targets
 # The official cmark repo builds unit ests by default, which we don't need here.
 # cmarktests also use a deprecated FindPython  modules that cause the build
 # to spit out warnings.
@@ -81,24 +82,23 @@ if (NOT cmark_POPULATED)            # if build targets not populated
 	# Add cmark build targets to this project
 	add_subdirectory(${cmark_SOURCE_DIR} ${cmark_BINARY_DIR})
 endif() # end Step 2. @}
+# @}
 
 if (TARGET Catch2)
-set_target_properties(Catch2 PROPERTIES
-	CXX_STANDARD 17
-)
+set_target_properties(Catch2 PROPERTIES CXX_STANDARD 17)
 endif()
 
 if (TARGET Catch2WithMain)
-set_target_properties(Catch2WithMain PROPERTIES
-	CXX_STANDARD 17
-) 
+set_target_properties(Catch2WithMain PROPERTIES CXX_STANDARD 17)
 endif()
 
-set_target_properties(cmark PROPERTIES
+set_target_properties(
+	cmark PROPERTIES
 	C_STANDARD 17
 	C_EXTENSIONS ON
 	)
-set_target_properties(cmark_static PROPERTIES
+set_target_properties(
+	cmark_static PROPERTIES
 	C_STANDARD 17
 	C_EXTENSIONS ON
 	)
