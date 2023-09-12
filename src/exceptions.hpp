@@ -11,6 +11,7 @@
 
 #include <exception>
 #include <stdexcept>
+#include <string>
 
 #define NOT_IMPLEMENTED std::runtime_error("Unimplemented Method");
 
@@ -20,23 +21,21 @@ class exception : public std::exception {
 	exception(
 	    const std::exception& innerException, const std::string& backtrace
 	)
-	    : stacktrace(backtrace), innerException(innerException)
+	    : std::exception(innerException)
+	    , innerException(innerException)
+	    , stacktrace(backtrace)
 	{
 	}
 
-	const char* what() const noexcept override
-	{
-		return innerException.what();
-	}
+	const char* what() override { return innerException.what(); }
 
 	const char* getStacktrace() const noexcept { return stacktrace.c_str(); }
 
     private:
-	inline std::string
-	generate_stacktrace()
+	inline std::string generate_stacktrace()
 	{
 		std::stringstream buffer;
-	#ifdef HAVE_EXECINFO_H
+#ifdef HAVE_EXECINFO_H
 		void* callstack[128];
 
 		int i, frames = backtrace(callstack, 128);
@@ -45,9 +44,9 @@ class exception : public std::exception {
 			buffer << strs[i] << std::endl;
 		}
 		free(strs);
-	#else
+#else
 		buffer << boost::stacktrace::stacktrace() << std::flush;
-	#endif
+#endif
 		return buffer.str();
 	}
 

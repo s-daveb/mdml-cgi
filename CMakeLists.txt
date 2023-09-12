@@ -5,9 +5,9 @@ if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
 endif()
 
 if (NOT DEFINED PROJECT_NAME)
-	set(NOT_SUBPROJECT ON)
+	set(IS_SUBPROJECT OFF)
 else()
-	set(NOT_SUBPROJECT OFF)
+	set(IS_SUBPROJECT ON)
 endif()
 
 project(mdml
@@ -17,6 +17,13 @@ project(mdml
 	DESCRIPTION "A CGI script written in C++ that converts markdown to HTML"
 )
 
+option(USE_SYSTEM_CATCH2 "Use system's installed Catch2 headers/libs" ON)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_C_STANDARD 17)
+set(CMAKE_C_EXTENSIONS OFF)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 find_program(CCACHE_PATH ccache)
 if(CCACHE_PATH)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CCACHE_PATH})
@@ -24,33 +31,41 @@ if(CCACHE_PATH)
 endif(CCACHE_PATH)
 
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS On)
+
 include(FetchContent)
 include(CheckIncludeFile)
+
+if (USE_SYSTEM_CATCH2)
+	find_package(Catch2 QUIET)
+	if (NOT Catch2_FOUND)
+		message("-- System Catch2 not found, building Catch2 🚧")
+		set(USE_SYSTEM_CATCH2 OFF)
+	else()
+		message("-- Found system Catch2, not building it ✅ ")
+	endif()
+endif()
 
 FetchContent_Declare(
    	cmark
 	URL https://github.com/commonmark/cmark/archive/refs/tags/0.30.3.zip
 	URL_HASH MD5=e806e6430ea49540f512ab98f32d4e2c
 )
+# FetchContent_MakeAvailable(cmark) @{
+# Just kidding!
+# Instead of calling FetchContent_MakeAvailable, use a more manual way
+# to import cmark's build targets.https
+# The official cmark repo builds unit ests by default, which we don't need here.
+# cmarktests also use a deprecated FindPython  modules that cause the build
+# to spit out warnings.
 
-FetchContent_Declare(
-   	Catch2
-	URL https://github.com/catchorg/Catch2/archive/refs/tags/v3.4.0.zip
-	URL_HASH MD5=c426e77d4ee0055410bc930182959ae5
-)
-
-
-# Instead of calling FetchContent_MakeAvailable, using a more manual way
-# to import cmark's build targets.    The official cmark repo builds unit
-# tests by default, which we don't need here. It also uses deprecated FindPython
-# modules that cause the build to spit out warnings.
-
-# Import the build variables from cmark
+# Step 1. Import the build variables from cmark
 FetchContent_GetProperties(cmark)
 
+# Step 2. Set Dependency options @{
 # cmark's cmake uses very deprecated functions for unit tests, and hence
 # cannot be imported with FetchContent_MakeAvailable.  A different process
-# has to be used to disable the broken build targets. 
+# has to be used to disable the broken build targets.
 if (NOT cmark_POPULATED)            # if build targets not populated
 
 	# Since these properties are /options/ of cmark, they need to be overriden
@@ -67,15 +82,45 @@ if (NOT cmark_POPULATED)            # if build targets not populated
 	FetchContent_Populate(cmark)    # populate remaining build targets
 	# Add cmark build targets to this project
 	add_subdirectory(${cmark_SOURCE_DIR} ${cmark_BINARY_DIR})
-endif()
-FetchContent_MakeAvailable(Catch2)
+endif() # end Step 2. @}
+# @}
 
+# Conditionally: FetchContent_Declare(Catch2) @{
+if (NOT USE_SYSTEM_CATCH2)
+	FetchContent_Declare(
+   		Catch2
+		URL https://github.com/catchorg/Catch2/archive/refs/tags/v3.4.0.zip
+		URL_HASH MD5=c426e77d4ee0055410bc930182959ae5
+	)
+# @}
+
+	FetchContent_MakeAvailable(Catch2)
+
+	# Set Catch2 build properties @{
+	set_target_properties(Catch2 PROPERTIES
+		CXX_STANDARD 17
+	)
+
+	set_target_properties(Catch2WithMain PROPERTIES
+		CXX_STANDARD 17
+	) # @}
+endif()
+
+set_target_properties(cmark PROPERTIES
+	C_STANDARD 17
+	C_EXTENSIONS ON
+)
+set_target_properties(cmark_static PROPERTIES
+	C_STANDARD 17
+	C_EXTENSIONS ON
+)
+# @}
 
 CHECK_INCLUDE_FILE("execinfo.h" HAVE_EXECINFO_H)
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/artifacts/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/artifacts/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/artifacts/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/artifacts/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/artifacts/bin)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	set(custom_dbg_flags "-O0 -ggdb")
@@ -98,6 +143,8 @@ endif()
 add_subdirectory(src)
 add_subdirectory(apps)
 
-if (NOT_SUBPROJECT)
+if (NOT IS_SUBPROJECT)
 	add_subdirectory(tests)
-endif(NOT_SUBPROJECT)
+endif(NOT IS_SUBPROJECT)
+
+# vim: ft=cmake sw=4 ts=4 noet sts=4 foldmethod=marker foldmarker=@{,@} :

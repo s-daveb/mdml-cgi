@@ -50,3 +50,5 @@ _deps
 build/*
 debug/*
 release/*
+.cache/*
+.DS_Store
