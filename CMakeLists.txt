@@ -17,7 +17,6 @@ project(mdml
 	DESCRIPTION "A CGI script written in C++ that converts markdown to HTML"
 )
 
-option(USE_SYSTEM_CATCH2 "Use system's installed Catch2 headers/libs" ON)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 17)
@@ -35,16 +34,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS On)
 
 include(FetchContent)
 include(CheckIncludeFile)
-
-if (USE_SYSTEM_CATCH2)
-	find_package(Catch2 QUIET)
-	if (NOT Catch2_FOUND)
-		message("-- System Catch2 not found, building Catch2 🚧")
-		set(USE_SYSTEM_CATCH2 OFF)
-	else()
-		message("-- Found system Catch2, not building it ✅ ")
-	endif()
-endif()
 
 FetchContent_Declare(
    	cmark
@@ -85,26 +74,24 @@ if (NOT cmark_POPULATED)            # if build targets not populated
 endif() # end Step 2. @}
 # @}
 
-# Conditionally: FetchContent_Declare(Catch2) @{
-if (NOT USE_SYSTEM_CATCH2)
+
 	FetchContent_Declare(
    		Catch2
 		URL https://github.com/catchorg/Catch2/archive/refs/tags/v3.4.0.zip
 		URL_HASH MD5=c426e77d4ee0055410bc930182959ae5
+		FIND_PACKAGE_ARGS
 	)
-# @}
+
 
 	FetchContent_MakeAvailable(Catch2)
 
-	# Set Catch2 build properties @{
 	set_target_properties(Catch2 PROPERTIES
 		CXX_STANDARD 17
 	)
 
 	set_target_properties(Catch2WithMain PROPERTIES
 		CXX_STANDARD 17
-	) # @}
-endif()
+	) 
 
 set_target_properties(cmark PROPERTIES
 	C_STANDARD 17
