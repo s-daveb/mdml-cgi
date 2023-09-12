@@ -6,7 +6,7 @@ add_executable(mdml_tests exceptions-test.cpp)
 target_include_directories(mdml_tests PRIVATE ${Catch2_INCLUDE_DIRS})
 
 # Link the test executable with your source code and Catch2
-target_link_libraries(mdml_tests PRIVATE mdml Catch2::Catch2WithMain)
+target_link_libraries(mdml_tests PRIVATE mdml_static Catch2::Catch2WithMain)
 
 list(APPEND CMAKE_MODULE_PATH ${Catch2_SOURCE_DIR}/extras)
 
