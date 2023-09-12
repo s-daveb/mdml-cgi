@@ -15,7 +15,7 @@ project(mdml
 	LANGUAGES C CXX
 	# HOMEPAGE_URL
 	DESCRIPTION "A CGI script written in C++ that converts markdown to HTML"
-)
+	)
 
 
 set(CMAKE_CXX_STANDARD 17)
@@ -36,11 +36,20 @@ include(FetchContent)
 include(CheckIncludeFile)
 
 FetchContent_Declare(
+   	Catch2
+	URL https://github.com/catchorg/Catch2/archive/refs/tags/v3.4.0.zip
+	URL_HASH MD5=c426e77d4ee0055410bc930182959ae5
+	FIND_PACKAGE_ARGS
+	)
+
+FetchContent_Declare(
    	cmark
 	URL https://github.com/commonmark/cmark/archive/refs/tags/0.30.3.zip
 	URL_HASH MD5=e806e6430ea49540f512ab98f32d4e2c
-)
-# FetchContent_MakeAvailable(cmark) @{
+	)
+# @}
+
+FetchContent_MakeAvailable(Catch2)
 # Just kidding!
 # Instead of calling FetchContent_MakeAvailable, use a more manual way
 # to import cmark's build targets.https
@@ -72,35 +81,27 @@ if (NOT cmark_POPULATED)            # if build targets not populated
 	# Add cmark build targets to this project
 	add_subdirectory(${cmark_SOURCE_DIR} ${cmark_BINARY_DIR})
 endif() # end Step 2. @}
-# @}
 
+if (TARGET Catch2)
+set_target_properties(Catch2 PROPERTIES
+	CXX_STANDARD 17
+)
+endif()
 
-	FetchContent_Declare(
-   		Catch2
-		URL https://github.com/catchorg/Catch2/archive/refs/tags/v3.4.0.zip
-		URL_HASH MD5=c426e77d4ee0055410bc930182959ae5
-		FIND_PACKAGE_ARGS
-	)
-
-
-	FetchContent_MakeAvailable(Catch2)
-
-	set_target_properties(Catch2 PROPERTIES
-		CXX_STANDARD 17
-	)
-
-	set_target_properties(Catch2WithMain PROPERTIES
-		CXX_STANDARD 17
-	) 
+if (TARGET Catch2WithMain)
+set_target_properties(Catch2WithMain PROPERTIES
+	CXX_STANDARD 17
+) 
+endif()
 
 set_target_properties(cmark PROPERTIES
 	C_STANDARD 17
 	C_EXTENSIONS ON
-)
+	)
 set_target_properties(cmark_static PROPERTIES
 	C_STANDARD 17
 	C_EXTENSIONS ON
-)
+	)
 # @}
 
 CHECK_INCLUDE_FILE("execinfo.h" HAVE_EXECINFO_H)
@@ -123,7 +124,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
     set(
 		CMAKE_CXX_FLAGS_RELEASE
 		"${CMAKE_CXX_FLAGS_RELEASE} ${custom_rel_flags}"
-	)
+		)
 endif()
 
 
