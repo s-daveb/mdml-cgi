@@ -1,4 +1,4 @@
-/* libmdml.cpp
+/* libmdml.hpp
  * Copyright © 2023 Saul D. Beniquez
  * License: Mozilla Public License v. 2.0
  *
@@ -7,10 +7,9 @@
  * obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#include <iostream>
-
-void print_hello() {
-	std::cout << "Hello World" << std::endl;
+void
+some_function()
+{
 	return;
 }
 

@@ -112,8 +112,10 @@ set_target_properties(
 CHECK_INCLUDE_FILE("execinfo.h" HAVE_EXECINFO_H)
 
 if (HAVE_EXECINFO_H)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHAVE_EXECINFO_H")
+	add_definitions(-DHAVE_EXECINFO_H=1)
 endif()
+
+include_directories(${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/include)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/artifacts/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/artifacts/lib)

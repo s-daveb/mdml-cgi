@@ -1,5 +1,5 @@
 
-set(LIBMDML_SOURCES libmdml.cpp)
+set(LIBMDML_SOURCES libmdml.cpp exception.cpp debuginfo.cpp)
 
 
 add_library(mdml SHARED ${LIBMDML_SOURCES})
