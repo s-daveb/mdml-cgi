@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.24)
 
+# Prevent in-source builds @
+if (CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR)
+    message(FATAL_ERROR "Source and build directories cannot be the same.")
+endif()
+
 if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
 	cmake_policy(SET CMP0135 NEW)
 endif()
@@ -105,6 +110,10 @@ set_target_properties(
 # @}
 
 CHECK_INCLUDE_FILE("execinfo.h" HAVE_EXECINFO_H)
+
+if (HAVE_EXECINFO_H)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHAVE_EXECINFO_H")
+endif()
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/artifacts/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/artifacts/lib)
