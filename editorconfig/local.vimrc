@@ -1,36 +1,33 @@
-" quartz-warriors/local.vimrc
-" License: The Unlicense @{
-" This is free and unencumbered software released into the public domain.
+" editorconfig/local.vimrc
+" Copyright © 2023 Saul D. Beniquez  @{
 "
-" Anyone is free to copy, modify, publish, use, compile, sell, or
-" distribute this software, either in source code form or as a compiled
-" binary, for any purpose, commercial or non-commercial, and by any
-" means.
+" Redistribution and use in source and binary forms, with or without
+" modification, are permitted provided that the following conditions are met:
 "
-" In jurisdictions that recognize copyright laws, the author or authors
-" of this software dedicate any and all copyright interest in the
-" software to the public domain. We make this dedication for the benefit
-" of the public at large and to the detriment of our heirs and
-" successors. We intend this dedication to be an overt act of
-" relinquishment in perpetuity of all present and future rights to this
-" software under copyright law.
+" 1. Redistributions of source code must retain the above copyright notice,
+"    this list of conditions and the following disclaimer.
 "
-" THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-" EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-" MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-" IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-" OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-" ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-" OTHER DEALINGS IN THE SOFTWARE.
+" 2. Redistributions in binary form must reproduce the above copyright notice,
+"    this list of conditions and the following disclaimer in the documentation
+"    and/or other materials provided with the distribution.
 "
-" For more information, please refer to <http://unlicense.org/>
-" @}
-
+" THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS”
+" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+" ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+" LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+" CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+" SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+" INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+" CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+" ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+" POSSIBILITY OF SUCH DAMAGE. @}
 
 let s:build_dir = 'vim-debug'
 let s:build_cores = 2
 let s:make_args =  '-C '. s:build_dir . ' -j ' . s:build_cores
 
+let s:cmake_path = system('which ' . 'cmake')
 let s:ninja_path  = system('which ' . 'ninja')
 
 let s:cmake_generator = 'Unix Makefiles'
@@ -38,43 +35,58 @@ if (s:ninja_path != '')
 	let s:cmake_generator = 'Ninja'
 endif
 
-let s:cmake_call = 'cmake ' .
-	\ '-B ' . s:build_dir . ' -DCMAKE_BUILD_TYPE=Debug ' . '-G ' . s:cmake_generator
+if (s:cmake_path != '')
+	let s:cmake_call = s:cmake_path .
+				\' -B ' . s:build_dir .
+				\' -D ' . 'CMAKE_BUILD_TYPE=Debug' .
+				\' -G ' . s:cmake_generator
+endif
 
 let s:make_call = 'make ' . s:make_args
 let s:ninja_call = 'ninja ' . s:make_args
 
-"if ! get(s:, 'defined', 0) " -- prevents the function from being redefined after compiling
-	function! BuildDebug()
-		let s:defined = 1
+if ! get(s:, 'defined', 0) " -- prevents the function from being redefined after compiling
+function! BuildDebug()
+	let s:defined = 1
 
-		wall
+	wall
 
-		if (!filereadable('vim-debug/CMakeCache.txt'))
-			exec ':Make ' . s:cmake_call
+	if (s:ninja_path == '')
+		if (
+		\ (!filereadable(s:build_dir . '/CMakeCache.txt')) ||
+		\ (!filereadable(s:build_dir . '/build.ninja'))
+		\ )
+			exec ':Dispatch ' . s:cmake_call
 		endif
 
-		if s:ninja_path == ''
-			if exists(':Make')
-				exec ':Make ' . s:make_args
-				cd ..
-			else
-				exec 'make ' . s:make_args
-				vert botright copen
-				vert resize +100
-			endif
-		else
-			set makeprg='ninja'
+		set makeprg='ninja'
+		exec ':Make ' . s:make_args
+	else
+		if (
+		\ (!filereadable(s:build_dir . '/CMakeCache.txt')) ||
+		\ (!filereadable(s:build_dir . '/Makefile'))
+		\ )
+			exec ':Dispatch ' . s:cmake_call
+		endif
+
+		if exists(':Make')
 			exec ':Make ' . s:make_args
-
+			cd ..
+		else
+			exec 'make ' . s:make_args
+			vert botright copen
+			vert resize +100
 		endif
+	endif
 
-	endfunction
-"endif
+endfunction
+endif
 
 nnoremap <leader>bd :call BuildDebug()<CR>
 
-"set path+=src
+set path+=src
+set path+=include
+set path+=app
 
 
 " vim: set ts=4 sts=4 noet sw=4 foldmethod=marker foldmarker=@{,@} :
