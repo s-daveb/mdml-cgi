@@ -9,10 +9,13 @@
 
 #include <iostream>
 
+int
+main(int argc, char** argv)
+{
 
-int main(int argc, char ** argv) {
-
-	return -1;
+	std::cout << "Content-type: text/plain" << std::endl;
+	std::cout << "Testing 1 2 3 ☕️" << std::endl << std::endl;
+	return 0;
 }
 
 // clang-format off
