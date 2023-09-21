@@ -30,7 +30,7 @@ class exception : public std::exception {
 	    const std::optional<std::exception> innerException = std::nullopt,
 	    const std::optional<std::string> backtrace = std::nullopt
 	);
-	const char* what() const noexcept override;
+	virtual const char* what() const noexcept override;
 
 	const char* getStacktrace() const noexcept;
 
