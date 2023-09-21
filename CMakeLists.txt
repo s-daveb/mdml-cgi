@@ -27,7 +27,7 @@ set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# @{ Nice-to-haves, ccache and compile_commands.json for clangd 
+# @{ Nice-to-haves, ccache and compile_commands.json for clangd
 find_program(CCACHE_PATH ccache)
 if(CCACHE_PATH)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CCACHE_PATH})
@@ -128,6 +128,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${custom_dbg_flags}")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${custom_dbg_flags}")
 
+	set(Boost_USE_STATIC_LIBS ON)
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
 	set(custom_rel_flags "-Os")
 
@@ -135,9 +136,19 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
     set(
 		CMAKE_CXX_FLAGS_RELEASE
 		"${CMAKE_CXX_FLAGS_RELEASE} ${custom_rel_flags}"
-		)
+	)
+	set(Boost_USE_STATIC_LIBS OFF)
+	set(Boost_USE_STATIC_RUNTIME OFF)
 endif()
 
+set(Boost_USE_STATIC_RUNTIME OFF)  # Do not require static C++ runtime
+set(Boost_USE_MULTITHREADED ON)
+
+find_package(Boost 1.82.0 COMPONENTS system filesystem REQUIRED)
+
+if (Boost_FOUND)
+	include_directories(${Boost_INCLUDE_DIRS})
+endif()
 
 add_subdirectory(src)
 add_subdirectory(apps)
