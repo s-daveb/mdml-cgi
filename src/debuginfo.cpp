@@ -19,36 +19,33 @@
 #include <sstream>
 #include <string>
 
-std::string
-generate_stacktrace(unsigned short framesToRemove)
-{
-	std::stringstream buffer;
-#ifdef HAVE_EXECINFO_H
-	void* callstack[128];
+std::string generate_stacktrace(unsigned short framesToRemove) {
+  std::stringstream buffer;
 
-	int i, frames = backtrace(callstack, 128);
-	char** strs = backtrace_symbols(callstack, frames);
-	for (i = framesToRemove; i < frames; ++i) {
-		buffer << strs[i] << std::endl;
-	}
-	free(strs);
+#ifdef HAVE_EXECINFO_H // @{
+  void *callstack[128];
+
+  int i, frames = backtrace(callstack, 128);
+  char **strs = backtrace_symbols(callstack, frames);
+  for (i = framesToRemove; i < frames; ++i) {
+    buffer << strs[i] << std::endl;
+  }
+  free(strs); // @}
 #else
-	buffer << boost::stacktrace::stacktrace() << std::flush;
+  buffer << boost::stacktrace::stacktrace() << std::flush;
 #endif
-	return buffer.str();
+  return buffer.str();
 }
 
-void
-print_cmdline(int argc, const char* argv[])
-{
-	int i;
+void print_cmdline(int argc, const char *argv[]) {
+  int i;
 
-	std::cout << "Command-line received" << std::endl;
-	for (i = 0; i < argc; ++i)
-		std::cout << argv[i] << " ";
-	std::cout << std::endl;
+  std::cout << "Command-line received" << std::endl;
+  for (i = 0; i < argc; ++i)
+    std::cout << argv[i] << " ";
+  std::cout << std::endl;
 }
 
 // clang-format off
-// vim: set foldmethod=marker foldmarker=#region,#endregion textwidth=80 ts=8 sts=0 sw=8 noexpandtab ft=cpp.doxygen :
+// vim: set foldmethod=marker foldmarker=@{,@} textwidth=80 ts=8 sts=0 sw=8 noexpandtab ft=cpp.doxygen :
 

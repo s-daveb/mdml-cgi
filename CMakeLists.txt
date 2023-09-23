@@ -9,11 +9,23 @@ if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
 	cmake_policy(SET CMP0135 NEW)
 endif()
 
+# When this package is included as a subproject, there's no need to
+# build and run the unit-tests. setting -D ENABLE_TESTS to false could
+# speed up build time for pacakge maintainers
 if (NOT DEFINED PROJECT_NAME)
-	set(IS_SUBPROJECT OFF)
+	option(ENABLE_TESTS "Build and run unit tests" ON)
 else()
-	set(IS_SUBPROJECT ON)
+	option(ENABLE_TESTS "Build and run unit tests" OFF)
 endif()
+
+if (UNIX AND NOT(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux"))
+	option(USE_BOOST_STACKTRACE "Use Boost::stacktrace for stack traces" OFF)
+	option(USE_EXECINFO_STACKTRACE "Use BSD/UNIX execinfo for stack traces" ON)
+else()
+	option(USE_BOOST_STACKTRACE "Use Boost::stacktrace for stack traces" ON)
+	option(USE_EXECINFO_STACKTRACE "Use BSD/UNIX execinfo for stack traces" OFF)
+endif()
+
 
 project(mdml
 	VERSION 0.1
@@ -40,12 +52,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS On)
 include(FetchContent)
 include(CheckIncludeFile)
 
+if(ENABLE_TESTS)
 FetchContent_Declare(
    	Catch2
 	URL https://github.com/catchorg/Catch2/archive/refs/tags/v3.4.0.zip
 	URL_HASH MD5=c426e77d4ee0055410bc930182959ae5
 	FIND_PACKAGE_ARGS
 	)
+endif()
 
 FetchContent_Declare(
    	cmark
@@ -54,7 +68,10 @@ FetchContent_Declare(
 	)
 # @}
 
-FetchContent_MakeAvailable(Catch2)
+# Avoid building Catch2 if unit tests aren't going to be built
+if (ENABLE_TESTS)
+	FetchContent_MakeAvailable(Catch2)
+endif()
 
 # FetchContent: cmark @{
 # Instead of calling FetchContent_MakeAvailable, use a more manual way
@@ -90,11 +107,11 @@ endif() # end Step 2. @}
 # @}
 
 if (TARGET Catch2)
-set_target_properties(Catch2 PROPERTIES CXX_STANDARD 17)
+	set_target_properties(Catch2 PROPERTIES CXX_STANDARD 17)
 endif()
 
 if (TARGET Catch2WithMain)
-set_target_properties(Catch2WithMain PROPERTIES CXX_STANDARD 17)
+	set_target_properties(Catch2WithMain PROPERTIES CXX_STANDARD 17)
 endif()
 
 set_target_properties(
@@ -109,10 +126,21 @@ set_target_properties(
 	)
 # @}
 
-CHECK_INCLUDE_FILE("execinfo.h" HAVE_EXECINFO_H)
+if (USE_EXECINFO_STACKTRACE)
+	CHECK_INCLUDE_FILE("execinfo.h" HAVE_EXECINFO_H)
 
-if (HAVE_EXECINFO_H)
-	add_definitions(-DHAVE_EXECINFO_H=1)
+	if (HAVE_EXECINFO_H)
+		add_definitions(-DHAVE_EXECINFO_H=1)
+	endif()
+
+	find_library(LIB_EXEC_INFO
+    	NAMES execinfo  # Specify the library name without the 'lib' prefix or file extension
+    	HINTS /usr/lib /usr/local/lib  # Optional hint for the library location
+	)
+	if (LIB_EXEC_INFO)
+   	   	message(STATUS "Found libexecinfo: ${LIB_EXEC_INFO}")
+		set(STACKTRACE_DEP_LIBS ${LIB_EXEC_INFO})
+	endif()
 endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/include)
@@ -128,7 +156,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${custom_dbg_flags}")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${custom_dbg_flags}")
 
-	set(Boost_USE_STATIC_LIBS ON)
+	if(USE_BOOST_STACKTRACE)
+		set(Boost_USE_STATIC_LIBS ON)
+	endif()
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
 	set(custom_rel_flags "-Os")
 
@@ -137,24 +167,28 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
 		CMAKE_CXX_FLAGS_RELEASE
 		"${CMAKE_CXX_FLAGS_RELEASE} ${custom_rel_flags}"
 	)
-	set(Boost_USE_STATIC_LIBS OFF)
-	set(Boost_USE_STATIC_RUNTIME OFF)
+
+	if(USE_BOOST_STACKTRACE)
+		set(Boost_USE_STATIC_LIBS OFF)
+	endif()
 endif()
 
-set(Boost_USE_STATIC_RUNTIME OFF)  # Do not require static C++ runtime
-set(Boost_USE_MULTITHREADED ON)
-
-find_package(Boost 1.82.0 COMPONENTS system filesystem REQUIRED)
+if(USE_BOOST_STACKTRACE)
+	set(Boost_USE_STATIC_RUNTIME OFF)  # Do not require static C++ runtime
+	set(Boost_USE_MULTITHREADED ON)
+	find_package(Boost 1.82.0 COMPONENTS system filesystem REQUIRED)
+endif()
 
 if (Boost_FOUND)
 	include_directories(${Boost_INCLUDE_DIRS})
+	set(STACKTRACE_DEP_LIBS  ${Boost_LIBRARIES})
 endif()
 
 add_subdirectory(src)
 add_subdirectory(apps)
 
-if (NOT IS_SUBPROJECT)
+if (ENABLE_TESTS)
 	add_subdirectory(tests)
-endif(NOT IS_SUBPROJECT)
+endif()
 
 # vim: ft=cmake sw=4 ts=4 noet sts=4 foldmethod=marker foldmarker=@{,@} :

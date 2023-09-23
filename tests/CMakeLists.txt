@@ -2,10 +2,16 @@
 # Add the test executable
 add_executable(mdml-tests exceptions-test.cpp)
 
+set_target_properties(mdml-tests PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/artifacts/tests"
+)
+
 target_include_directories(mdml-tests PRIVATE ${Catch2_INCLUDE_DIRS})
 
 # Link the test executable with libmdml_static source code and Catch2
 target_link_libraries(mdml-tests PRIVATE mdml_static Catch2::Catch2WithMain)
+
+
 
 # Extras: Catch2 Ctest integration. @{
 # add catch2's ctest CMake module and register the tests defined by mdml-tests
