@@ -16,8 +16,9 @@ std::map<std::string, std::wstring> template_map;
 void
 load_template()
 {
-	template_map["index"] = L"<html>\
-	<head><title>Hello world</title</head>\
+	template_map["index"] = "<html>\
+	<head><title>Hello world</title>\
+	<meta charset=\"UTF-8\"></head>\
 	<body>Testing 1 2 3 ☕️ </body>\
 	</html>";
 }
