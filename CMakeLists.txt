@@ -71,6 +71,15 @@ FetchContent_Declare(
 # Avoid building Catch2 if unit tests aren't going to be built
 if (ENABLE_TESTS)
 	FetchContent_MakeAvailable(Catch2)
+	if (TARGET Catch2)
+		set_target_properties(Catch2 PROPERTIES CXX_STANDARD 17)
+	endif()
+
+	if (TARGET Catch2WithMain)
+		set_target_properties(Catch2WithMain PROPERTIES CXX_STANDARD 17)
+endif()
+
+
 endif()
 
 # FetchContent: cmark @{
@@ -106,14 +115,7 @@ if (NOT cmark_POPULATED)            # if build targets not populated
 endif() # end Step 2. @}
 # @}
 
-if (TARGET Catch2)
-	set_target_properties(Catch2 PROPERTIES CXX_STANDARD 17)
-endif()
-
-if (TARGET Catch2WithMain)
-	set_target_properties(Catch2WithMain PROPERTIES CXX_STANDARD 17)
-endif()
-
+# Set compiler standards for dependencies
 set_target_properties(
 	cmark PROPERTIES
 	C_STANDARD 17
