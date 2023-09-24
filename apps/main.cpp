@@ -11,7 +11,7 @@
 #include <map>
 #include <string>
 
-std::map<std::string, std::wstring> template_map;
+std::map<std::string, std::string> template_map;
 
 void
 load_template()
@@ -29,7 +29,7 @@ main(int argc, char** argv)
 	load_template();
 
 	std::cout << "Content-Type: text/html" << std::endl << std::endl;
-	std::wcout << template_map["index"] << std::endl;
+	std::cout << template_map["index"] << std::endl;
 	return 0;
 }
 
