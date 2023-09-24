@@ -9,7 +9,6 @@ AccessModifierOffset: -4
 BinPackParameters: true
 AlwaysBreakAfterDefinitionReturnType: TopLevel
 AlwaysBreakAfterReturnType: None
-ConstructorInitializerIndentWidth: 2
 ContinuationIndentWidth: 4
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 ConstructorInitializerIndentWidth: 4
