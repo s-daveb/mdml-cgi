@@ -8,13 +8,27 @@
  */
 
 #include <iostream>
+#include <map>
+#include <string>
+
+std::map<std::string, std::string> template_map;
+
+void
+load_template()
+{
+	template_map["index"] = L"<html>\
+	<head><title>Hello world</title</head>\
+	<body>Testing 1 2 3 ☕️ </body>\
+	</html>;"
+}
 
 int
 main(int argc, char** argv)
 {
+	load_template();
 
-	std::cout << "Content-type: text/plain" << std::endl;
-	std::cout << "Testing 1 2 3 ☕️" << std::endl << std::endl;
+	std::cout << "Content-Type: text/html" << std::endl << std::endl;
+	std::cout << template_map["index"] << std::endl;
 	return 0;
 }
 
