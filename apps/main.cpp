@@ -11,7 +11,7 @@
 #include <map>
 #include <string>
 
-std::map<std::string, std::string> template_map;
+std::map<std::string, std::wstring> template_map;
 
 void
 load_template()
@@ -19,7 +19,7 @@ load_template()
 	template_map["index"] = L"<html>\
 	<head><title>Hello world</title</head>\
 	<body>Testing 1 2 3 ☕️ </body>\
-	</html>;"
+	</html>";
 }
 
 int
@@ -28,7 +28,7 @@ main(int argc, char** argv)
 	load_template();
 
 	std::cout << "Content-Type: text/html" << std::endl << std::endl;
-	std::cout << template_map["index"] << std::endl;
+	std::wcout << template_map["index"] << std::endl;
 	return 0;
 }
 
