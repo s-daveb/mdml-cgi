@@ -9,28 +9,27 @@
 
 #include "exception.hpp"
 
+#include "tests-common.hpp"
+
 #include <catch2/catch_test_macros.hpp>
 #include <iostream>
+#include <optional>
 
-#define TEST(testname) TEST_CASE(testname, TEST_SUITE_NAME)
-
-namespace {
-const char* TEST_SUITE_NAME = "mdml::exceptions";
-
-// @todo: move this to a runtime-test.cpp file
-TEST("Test the test framework")
+BEGIN_TEST_SUITE("exceptions")
 {
-	REQUIRE_THROWS(
-	    []() { throw std::runtime_error("Error Message"); }(),
-	    "Expected Error Message"
-	);
+	// @todo: move this to a runtime-test.cpp file
+	TEST("Test the test framework")
+	{
+		REQUIRE_THROWS([]() {
+			throw std::runtime_error("Error Message");
+		}());
 
-	try {
-		throw mdml::exception(std::runtime_error("NOT IMPLEMENTED"));
-	} catch (mdml::exception& e) {
-		std::cout << e.what() << std::endl;
-	}
+		try {
+			throw mdml::exception(std::runtime_error("ERROR"));
+		} catch (mdml::exception& e) {
+			std::cout << "Caught exception: " << e.what()
+				  << std::endl;
+		}
 
-} // #endregion
-
+	} // #endregion
 }

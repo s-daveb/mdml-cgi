@@ -7,8 +7,10 @@
  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "debuginfo.hpp"
 #include "exception.hpp"
+
+#include "debuginfo.hpp"
+#include "types.hpp"
 
 #include <algorithm>
 #include <exception>
@@ -22,32 +24,68 @@
 using mdml::exception;
 
 exception::exception(
-    const std::optional<std::exception> innerException,
+    optional_reference<std::exception> nestedException,
     const std::optional<std::string> backtrace
 )
-    : std::exception(), stacktrace(std::nullopt), innerException(std::nullopt)
+    : std::exception(), stacktrace(std::nullopt), inner_exception_ptr(nullptr)
 {
+	if (nestedException.has_value()) {
+		this->inner_exception_ptr =
+		    std::make_exception_ptr(nestedException.value().get());
+	}
+
 	if (!backtrace.has_value()) {
 		this->stacktrace = generate_stacktrace(2);
 	} else {
 		this->stacktrace = backtrace;
 	}
 
-	if (innerException.has_value()) {
-		this->innerException = *(innerException);
-	}
+	build_what_message();
+}
+
+exception::exception(const std::runtime_error& e)
+    : std::exception(), inner_exception_ptr(), stacktrace(std::nullopt)
+{
+	inner_exception_ptr = std::make_exception_ptr(e);
+	this->stacktrace = generate_stacktrace(2);
+
+	build_what_message();
 }
 
 const char*
 exception::what() const noexcept
 {
-	return innerException->what();
+	return this->what_message.c_str();
 }
 
 const char*
 exception::getStacktrace() const noexcept
 {
-	return stacktrace->c_str();
+	return this->stacktrace->c_str();
+}
+
+void
+exception::build_what_message()
+{
+	std::stringstream buffer;
+
+	if (inner_exception_ptr) {
+		try {
+			std::rethrow_exception(inner_exception_ptr);
+		} catch (const std::exception& rethrown) {
+			buffer << rethrown.what();
+		}
+	} else {
+		buffer << "An error has ocurred. (No Inner exception)";
+	}
+	buffer << std::endl;
+
+	if (this->stacktrace.has_value()) {
+		buffer << std::endl << "Backtrace: " << std::endl;
+		buffer << this->stacktrace.value() << std::endl;
+	}
+
+	what_message = buffer.str();
 }
 
 // clang-format off

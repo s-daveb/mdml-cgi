@@ -11,7 +11,7 @@
 #include <iostream>
 #include <sstream>
 
-#ifdef QW_DEBUG // #region
+#ifdef DEBUG // #region
 #include <iostream>
 #define debugprint(msg) std::cout << "#*!* " << msg << std::endl
 #else

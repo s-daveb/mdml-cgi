@@ -53,4 +53,5 @@ release/*
 .cache/*
 .DS_Store
 
+*-build/
 *debug/

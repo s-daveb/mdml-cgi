@@ -10,6 +10,7 @@
 #pragma once
 
 #include "debuginfo.hpp"
+#include "types.hpp"
 
 #include <algorithm>
 #include <exception>
@@ -24,19 +25,25 @@
 	throw mdml::exception(message, generate_stacktrace(2))
 
 namespace mdml {
+
 class exception : public std::exception {
     public:
-	exception(
-	    const std::optional<std::exception> innerException = std::nullopt,
+	explicit exception(
+	    optional_reference<std::exception> innerException = std::nullopt,
 	    const std::optional<std::string> backtrace = std::nullopt
 	);
+	exception(const std::runtime_error& e);
+
 	virtual const char* what() const noexcept override;
 
 	const char* getStacktrace() const noexcept;
 
     private:
+	void build_what_message();
+
+	std::string what_message;
 	std::optional<std::string> stacktrace;
-	std::optional<std::exception> innerException;
+	std::exception_ptr inner_exception_ptr;
 };
 }
 // clang-format off
