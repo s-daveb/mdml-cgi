@@ -20,6 +20,27 @@
 #include <sstream>
 #include <string>
 
+namespace {
+// Function to strip symbols enclosed within <>
+std::string
+stripTemplates(const std::string& input)
+{
+	std::string result;
+	bool insideAngleBrackets = false;
+
+	for (char c : input) {
+		if (c == '<') {
+			insideAngleBrackets = true;
+		} else if (c == '>') {
+			insideAngleBrackets = false;
+		} else if (!insideAngleBrackets) {
+			result += c;
+		}
+	}
+
+	return result;
+}
+}
 std::string
 generate_stacktrace(unsigned short framesToRemove)
 {
@@ -34,16 +55,19 @@ generate_stacktrace(unsigned short framesToRemove)
 		std::stringstream line_stream(strs[i]);
 		std::string word;
 
-		// Split the demangled name by spaces and demangle each word
+		// Split the demangled name by spaces, strip template symbols,
+		// and demangle each word
 		while (line_stream >> word) {
 			if (word.find("0x") == std::string::npos) {
+				word = stripTemplates(word
+				); // Strip symbols within <>
 				int status;
 				char* demangled_word = abi::__cxa_demangle(
 				    word.c_str(), nullptr, nullptr, &status
 				);
 
 				if (status == 0) {
-					buffer << '\t' << demangled_word << ' ';
+					buffer << demangled_word << ' ';
 					std::free(demangled_word);
 				} else {
 					buffer << word << ' ';
