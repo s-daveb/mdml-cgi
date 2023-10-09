@@ -19,6 +19,13 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
+
+#ifdef __FreeBSD__
+constexpr bool HAVE_FREEBSD = true;
+#else
+constexpr bool HAVE_FREEBSD = false;
+#endif
 
 namespace {
 // Function to strip symbols enclosed within <>
@@ -31,9 +38,17 @@ stripTemplates(const std::string& input)
 	for (char c : input) {
 		if (c == '<') {
 			insideAngleBrackets = true;
-		} else if (c == '>') {
+			continue;
+		}
+		if (c == '>') {
 			insideAngleBrackets = false;
-		} else if (!insideAngleBrackets) {
+			continue;
+		}
+		if (c == '+') {
+			break;
+		}
+
+		if (insideAngleBrackets) {
 			result += c;
 		}
 	}
@@ -51,29 +66,41 @@ generate_stacktrace(unsigned short framesToRemove)
 	int i, frames = backtrace(callstack, 128);
 	char** strs = backtrace_symbols(callstack, frames);
 
+	size_t columns_to_print = 0;
+
+	if (HAVE_FREEBSD) {
+		columns_to_print = 2;
+	}
 	for (i = framesToRemove; i < frames; ++i) {
-		std::stringstream line_stream(strs[i]);
 		std::string word;
+		std::stringstream line_stream(strs[i]);
+		std::vector<std::string> wordlist;
 
-		// Split the demangled name by spaces, strip template symbols,
-		// and demangle each word
+		// Create a list of words for this stack trace line
 		while (line_stream >> word) {
-			if (word.find("0x") == std::string::npos) {
-				word = stripTemplates(word
-				); // Strip symbols within <>
-				int status;
-				char* demangled_word = abi::__cxa_demangle(
-				    word.c_str(), nullptr, nullptr, &status
-				);
+			if (HAVE_FREEBSD && (word.find('<') != word.npos &&
+			                     word.find('>') != word.npos)) {
+				auto stripped_word = stripTemplates(word);
+				word = stripped_word;
+			}
+			wordlist.push_back(word);
+		}
+		if (!columns_to_print) {
+			columns_to_print = wordlist.size();
+		}
+		for (unsigned pos = 0; pos < columns_to_print; ++pos) {
+			auto word = wordlist[pos];
+			int status;
 
-				if (status == 0) {
-					buffer << demangled_word << ' ';
-					std::free(demangled_word);
-				} else {
-					buffer << word << ' ';
-				}
+			char* demangled_word = abi::__cxa_demangle(
+			    word.c_str(), nullptr, nullptr, &status
+			);
+
+			if (status == 0) {
+				buffer << demangled_word << '\t';
+				std::free(demangled_word);
 			} else {
-				buffer << word << ' ';
+				buffer << word << '\t';
 			}
 		}
 
