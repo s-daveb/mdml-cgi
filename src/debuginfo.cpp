@@ -22,15 +22,17 @@
 #include <vector>
 
 #ifdef __FreeBSD__
-constexpr bool HAVE_FREEBSD = true;
+constexpr bool FREEBSD = true;
 #else
-constexpr bool HAVE_FREEBSD = false;
+constexpr bool FREEBSD = false;
 #endif
 
+namespace mdml {
 namespace {
-// Function to strip symbols enclosed within <>
+
+// Extracts the mangled symbol from a string like <func_name+0x34>
 std::string
-stripTemplates(const std::string& input)
+extract_mangled_symbol(const std::string& input)
 {
 	std::string result;
 	bool insideAngleBrackets = false;
@@ -56,19 +58,21 @@ stripTemplates(const std::string& input)
 	return result;
 }
 }
+
+// There is a lot of C and platform-specific hacks contained within
+// I am sorry. 🤡
 std::string
 generate_stacktrace(unsigned short framesToRemove)
 {
 	std::stringstream buffer;
-	char* demangled_name;
-
 	void* callstack[128];
 	int i, frames = backtrace(callstack, 128);
 	char** strs = backtrace_symbols(callstack, frames);
 
 	size_t columns_to_print = 0;
 
-	if (HAVE_FREEBSD) {
+	// preconfigure column length for certain platforms
+	if (FREEBSD) {
 		columns_to_print = 2;
 	}
 	for (i = framesToRemove; i < frames; ++i) {
@@ -78,27 +82,32 @@ generate_stacktrace(unsigned short framesToRemove)
 
 		// Create a list of words for this stack trace line
 		while (line_stream >> word) {
-			if (HAVE_FREEBSD && (word.find('<') != word.npos &&
-			                     word.find('>') != word.npos)) {
-				auto stripped_word = stripTemplates(word);
-				word = stripped_word;
+			if (FREEBSD && (word.find('<') != word.npos &&
+			                word.find('>') != word.npos)) {
+				auto extracted_symbol =
+				    extract_mangled_symbol(word);
+				word = extracted_symbol;
 			}
 			wordlist.push_back(word);
 		}
+		// if columns_to_print is still 0, assign it to the list length
+		// It is only pre-configured for certain platforms, see above
 		if (!columns_to_print) {
 			columns_to_print = wordlist.size();
 		}
+		// Process the extracted words one at a time and format the
+		// stack trace string
 		for (unsigned pos = 0; pos < columns_to_print; ++pos) {
 			auto word = wordlist[pos];
 			int status;
 
-			char* demangled_word = abi::__cxa_demangle(
+			char* demangled_symbol = abi::__cxa_demangle(
 			    word.c_str(), nullptr, nullptr, &status
 			);
 
 			if (status == 0) {
-				buffer << demangled_word << '\t';
-				std::free(demangled_word);
+				buffer << demangled_symbol << '\t';
+				std::free(demangled_symbol);
 			} else {
 				buffer << word << '\t';
 			}
@@ -107,7 +116,7 @@ generate_stacktrace(unsigned short framesToRemove)
 		buffer << std::endl;
 	}
 
-	free(strs);
+	std::free(strs);
 
 	return buffer.str();
 }
@@ -123,6 +132,7 @@ print_cmdline(int argc, const char* argv[])
 	std::cout << std::endl;
 }
 
+}
 // clang-format off
 // vim: set foldmethod=marker foldmarker=@{,@} textwidth=80 ts=8 sts=0 sw=8 noexpandtab ft=cpp.doxygen :
 

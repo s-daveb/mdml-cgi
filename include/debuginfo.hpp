@@ -18,9 +18,13 @@
 #define debugprint(msg) ;
 #endif // #endregion
 
+namespace mdml {
+
 std::string generate_stacktrace(unsigned short framesToRemove = 1);
 
 void print_cmdline(int argc, const char* argv[]);
+
+}
 
 // clang-format off
 // vim: set foldmethod=marker foldmarker=#region,#endregion textwidth=80 ts=8 sts=0 sw=8 noexpandtab ft=cpp.doxygen :
