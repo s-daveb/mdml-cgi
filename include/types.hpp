@@ -10,7 +10,9 @@
 #pragma once
 
 #include <functional>
+#include <map>
 #include <optional>
+#include <string>
 
 namespace mdml {
 
@@ -26,6 +28,8 @@ using const_reference = std::reference_wrapper<const T>;
 template<typename T>
 using opt_const_reference = std::optional<const_reference<const T>>;
 
+template<typename value_t>
+using Dictionary = std::map<std::string, value_t>;
 }
 
 // clang-format off

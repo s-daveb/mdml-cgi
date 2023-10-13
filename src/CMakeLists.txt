@@ -1,5 +1,10 @@
 
-set(LIBMDML_SOURCES libmdml.cpp exception.cpp debuginfo.cpp)
+set(LIBMDML_SOURCES
+	libmdml.cpp
+	exception.cpp
+	debuginfo.cpp
+	Application.cpp
+)
 set(LIBMDML_LINK_LIBS ${STACKTRACE_DEP_LIBS})
 
 add_library(mdml SHARED ${LIBMDML_SOURCES})
