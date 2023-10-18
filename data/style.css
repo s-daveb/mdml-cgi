@@ -1,0 +1,292 @@
+:root {
+	--border-color: black;
+	--font-color: black;
+	--body-color: #FFFCF3;
+	--element-bg-color: #FFFCF3;
+
+	--btn-hover-color: lightgrey;
+	--btn-border-color: black;
+
+	--title-btn-bg-color: none;
+	--title-btn-font-size: 18px;
+	--title-btn-font-weight: bold;
+
+	--src-btn-bg-color: green;
+	--src-btn-border:  black;
+	--src-btn-font-color: white;
+
+	--footer-btn-bg-color: lightgrey;
+	--footer-btn-fg-color: black;
+	--footer-btn-border-color:  black;
+	--footer-btn-font-size: 12px;
+}
+
+html {
+	line-height: 1.5;
+	height: 95vh;
+}
+
+body {
+	margin: 1rem 1.5rem 1rem 1.5rem;
+	padding: 1rem 1rem 0 1rem;
+	max-width: 50rem;
+}
+body.body-style {
+	border: 1px solid black;
+
+	font-size: 14pt;
+	font-family: 'IBM Plex Sans' !important;
+
+	background-color: var(--body-color);
+}
+
+@media (max-width: 768px) {
+	body {
+		margin: 1rem 0 1rem 0;
+		padding: 1rem 0 0 0;
+	}
+}
+
+div.content {
+	overflow: auto;
+}
+
+@media (max-width: 576px) {
+	div.content {
+    	max-height: 50%;
+
+	}
+}
+@media (max-width: 768px) {
+	div.content {
+    	max-height: 75%;
+	}
+}
+
+@media (min-width: 768px) {
+	div.content {
+    	height: 100%;
+	}
+}
+
+.m-leftright-auto {
+	margin-right: auto;
+	margin-left: auto;
+}
+
+.center-text {
+	text-align: center;
+}
+
+.align-left {
+	text-align: left;
+}
+
+.align-right {
+	text-align: right;
+}
+
+div._btn,
+.square-btn {
+	font-family: "Berkeley Mono";
+	border: 1px solid var(--border-color);
+	background-color: var(--element-bg-color);
+}
+div._btn:hover,
+.square-btn:hover {
+	background-color: var(--btn-hover-color);
+	box-shadow: 1px 1px 0px rgba(0, 0, 0, 0);
+}
+
+
+#navigation div._btn,
+.btn-shadow {
+	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
+}
+
+#navigation div._btn:hover {
+	background-color: var(--btn-hover-color);
+	box-shadow: 1px 1px 0px rgba(0, 0, 0, 0);
+	text-decoration: underline;
+}
+
+@media (min-width: 768px) {
+	div._btn {
+		padding: 0 2em 0 2em;
+		margin: 0 0.25rem 0 0.25rem;
+	}
+}
+
+/* width < 768px */
+div._btn {
+	padding: 0 2em 0 2em;
+	margin: 0.25rem 0.25rem 0.25rem 0.25rem;
+}
+
+div.header-btn,
+#titlebar div._btn {
+	color: var(--font-color);
+	background-color: var(--title-btn-bg-color);
+	font-size: var(--title-btn-font-size);
+	font-weight: var(--title-btn-font-weight);
+	padding: 0 0.5rem 0 0.5rem;
+	margin: 0 0 0 0;
+}
+
+#titlebar div.logo {
+	border: none;
+	/*text-decoration: underline;*/
+	text-transform: uppercase;
+}
+
+#titlebar div.source-btn {
+	border-color: var(--src-btn-border);
+	color: var(--src-btn-font-color);
+	background-color: var(--src-btn-bg-color);
+	margin: 0 0.125rem 0 0.125rem;
+}
+
+#titlebar {
+	background-color: inherit;
+}
+
+
+footer div._btn {
+	font-size: var(--footer-btn-font-size);
+}
+
+footer {
+	margin: auto 0.25rem 0.125rem 0.25rem;
+}
+
+footer div {
+	vertical-align: middle;
+}
+
+#titlebar {
+	border-color: #ccc;
+	border-style: solid;
+	border-width: 1px;
+
+	border-top: 0;
+	border-left: 0;
+	border-right: 0;
+
+	margin-bottom: 0.5rem;
+}
+
+#navigation {
+	margin: 0rem auto 3rem auto;
+}
+
+.navbar div a {
+	color: inherit;
+	text-decoration: none;
+}
+
+@media (prefers-color-scheme: dark) {
+	@include "dark-mode.css"
+}
+
+div.content {
+	overflow: auto;
+}
+
+@media (max-width: 576px) {
+	div.content {
+    	max-height: 50%;
+
+	}
+}
+@media (max-width: 768px) {
+	div.content {
+    	max-height: 75%;
+	}
+}
+
+div.content {
+    height: 100%;
+}
+
+body.body-style {
+	border: 1px solid black;
+
+	font-size: 14pt;
+	font-family: 'IBM Plex Sans' !important;
+}
+
+div._btn,
+.square-btn {
+	font-family: "Berkeley Mono";
+	border-width: 1px;
+	border-style: solid;
+	border-color: var(--btn-border-color);
+}
+#navigation {
+	margin: 0rem auto 3rem auto;
+}
+#navigation div._btn,
+.btn-shadow {
+	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
+}
+
+@media (min-width: 768px) {
+	div._btn {
+		padding: 0 2em 0 2em;
+		margin: 0 0.25rem 0 0.25rem;
+	}
+}
+
+/* width < 768px */
+div._btn {
+	padding: 0 2em 0 2em;
+	margin: 0.25rem 0.25rem 0.25rem 0.25rem;
+}
+
+
+footer div._btn {
+	border-style: dotted;
+	border-width: 0.5px;
+	border-color: var(--footer-btn-border-color);
+	background-color: var(--element-btn-bg-color);
+	color: var(--footer-btn-fg-color);
+	font-size: var(--footer-btn-font-size);
+}
+
+footer div._btn:hover {
+	background-color: var(--btn-hover-color);
+}
+
+footer {
+	margin: auto 0.25rem 0.125rem 0.25rem;
+	padding: 0 0 0.125rem 0;
+}
+
+footer div {
+	vertical-align: middle;
+}
+
+#titlebar {
+	background-color: inherit;
+
+	border-color: #ccc;
+	border-style: solid;
+	border-width: 1px;
+
+	border-top: 0;
+	border-left: 0;
+	border-right: 0;
+
+	margin-bottom: 0.5rem;
+}
+
+.allcaps { 
+	text-transform: uppercase;
+}
+
+
+
+
+
+/* vim: ts=4 sts=4 noet sw=4 :
+*/
