@@ -19,30 +19,28 @@
 #include <stdexcept>
 #include <string>
 
-#define NOT_IMPLEMENTED std::runtime_error("Unimplemented Method");
-
-#define THROW_EXCEPTION(message)                                                \
-	throw mdml::exception(message, generate_stacktrace(2))
-
 namespace mdml {
 
 class exception : public std::exception {
+
     public:
-	explicit exception(
-	    optional_reference<std::exception> innerException = std::nullopt,
-	    const std::optional<std::string> backtrace = std::nullopt
-	);
-	exception(const std::runtime_error& e);
+	exception(const char* error_message = default_error);
+	exception(const std::exception& inner);
+
+	exception& operator=(const exception&) = delete;
 
 	virtual const char* what() const noexcept override;
+	const std::string& stacktrace() const noexcept;
 
-	const char* getStacktrace() const noexcept;
+	constexpr static auto default_error = "An exception has ocurred!";
 
     private:
 	void build_what_message();
 
+	std::string error_message;
 	std::string what_message;
-	std::optional<std::string> stacktrace;
+	std::string stack_trace;
+
 	std::exception_ptr inner_exception_ptr;
 };
 }

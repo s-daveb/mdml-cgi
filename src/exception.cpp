@@ -14,41 +14,35 @@
 
 #include <algorithm>
 #include <exception>
+#include <iostream>
 #include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 
-#define NOT_IMPLEMENTED std::runtime_error("Unimplemented Method");
-
 using mdml::exception;
 
-exception::exception(
-    optional_reference<std::exception> nestedException,
-    const std::optional<std::string> backtrace
-)
-    : std::exception(), stacktrace(std::nullopt), inner_exception_ptr(nullptr)
+constexpr unsigned DEFAULT_STACKFRAMES_TO_STRIP = 2;
+
+// Helper classes and functions. #region
+
+exception::exception(const char* error_message)
+    : std::exception()
+    , error_message(error_message)
+    , what_message()
+    , stack_trace(mdml::generate_stacktrace(DEFAULT_STACKFRAMES_TO_STRIP))
+    , inner_exception_ptr()
 {
-	if (nestedException.has_value()) {
-		this->inner_exception_ptr =
-		    std::make_exception_ptr(nestedException.value().get());
-	}
-
-	if (!backtrace.has_value()) {
-		this->stacktrace = generate_stacktrace(2);
-	} else {
-		this->stacktrace = backtrace;
-	}
-
 	build_what_message();
 }
 
-exception::exception(const std::runtime_error& e)
-    : std::exception(), inner_exception_ptr(), stacktrace(std::nullopt)
+exception::exception(const std::exception& inner)
+    : std::exception(inner)
+    , error_message(inner.what())
+    , what_message()
+    , inner_exception_ptr(std::make_exception_ptr(&inner))
+    , stack_trace(mdml::generate_stacktrace(DEFAULT_STACKFRAMES_TO_STRIP))
 {
-	inner_exception_ptr = std::make_exception_ptr(e);
-	this->stacktrace = generate_stacktrace(2);
-
 	build_what_message();
 }
 
@@ -58,33 +52,48 @@ exception::what() const noexcept
 	return this->what_message.c_str();
 }
 
-const char*
-exception::getStacktrace() const noexcept
+const std::string&
+exception::stacktrace() const noexcept
 {
-	return this->stacktrace->c_str();
+	return this->stack_trace;
 }
 
+std::string
+prepend_tabs_to_lines(const std::string& input)
+{
+	std::ostringstream results_buffer;
+	std::istringstream input_buffer(input);
+
+	// Function to add a tab character before each line
+	auto addTabBeforeLine = [&results_buffer](const std::string& line) {
+		results_buffer << '\t' << line << '\n';
+	};
+
+	// Process each line and add a tab character before it
+	std::string line;
+	while (std::getline(input_buffer, line)) {
+		addTabBeforeLine(line);
+	}
+
+	return results_buffer.str();
+}
 void
 exception::build_what_message()
 {
 	std::stringstream buffer;
+	std::string indented_stacktrace =
+	    prepend_tabs_to_lines(this->stack_trace);
 
-	if (inner_exception_ptr) {
-		try {
-			std::rethrow_exception(inner_exception_ptr);
-		} catch (const std::exception& rethrown) {
-			buffer << rethrown.what();
-		}
-	} else {
-		buffer << "An error has ocurred. (No Inner exception)";
-	}
+	buffer << "mdml::exception::what(): { " << std::endl;
+
+	buffer << "	error: " << error_message << std::endl;
+
 	buffer << std::endl;
 
-	if (this->stacktrace.has_value()) {
-		buffer << std::endl << "Backtrace: " << std::endl;
-		buffer << this->stacktrace.value() << std::endl;
-	}
+	buffer << "	stack_trace: " << std::endl
+	       << indented_stacktrace << std::endl;
 
+	buffer << "}; " << std::endl;
 	what_message = buffer.str();
 }
 

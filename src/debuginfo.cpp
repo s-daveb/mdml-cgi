@@ -8,6 +8,7 @@
  */
 
 #include "debuginfo.hpp"
+#include "platform.hpp"
 
 #if defined(HAVE_EXECINFO_H) && !defined(__linux__)
 #include <cxxabi.h>
@@ -21,12 +22,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-
-#ifdef __FreeBSD__
-constexpr bool FREEBSD = true;
-#else
-constexpr bool FREEBSD = false;
-#endif
 
 namespace mdml {
 namespace {
@@ -74,9 +69,12 @@ generate_stacktrace(unsigned short framesToRemove)
 	size_t columns_to_print = 0;
 
 	// preconfigure column length for certain platforms
-	if (FREEBSD) {
+	if (Platform::FREEBSD) {
 		columns_to_print = 2;
+	} else if (Platform::MACOS) {
+		columns_to_print = 4;
 	}
+
 	for (i = framesToRemove; i < frames; ++i) {
 		std::string word;
 		std::stringstream line_stream(strs[i]);
@@ -84,8 +82,9 @@ generate_stacktrace(unsigned short framesToRemove)
 
 		// Create a list of words for this stack trace line
 		while (line_stream >> word) {
-			if (FREEBSD && (word.find('<') != word.npos &&
-			                word.find('>') != word.npos)) {
+			if (columns_to_print != 0 &&
+			    (word.find('<') != word.npos &&
+			     word.find('>') != word.npos)) {
 				auto extracted_symbol =
 				    extract_mangled_symbol(word);
 				word = extracted_symbol;
