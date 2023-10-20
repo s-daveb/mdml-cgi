@@ -60,7 +60,7 @@ extract_mangled_symbol(const std::string& input)
 }
 }
 
-// There is a lot of C and platform-specific hacks contained within
+// There are a lot of C and platform-specific hacks contained within
 // I am sorry. 🤡
 std::string
 generate_stacktrace(unsigned short framesToRemove)
