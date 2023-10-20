@@ -61,9 +61,6 @@ function! BuildDebug()
 
 			exec ':Dispatch ' . s:cmake_call
 		endif
-		echo "found ninja"
-
-		sleep 5
 
 		set makeprg='ninja'
 		exec ':Make ' . s:make_args
