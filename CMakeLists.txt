@@ -53,19 +53,19 @@ include(FetchContent)
 include(CheckIncludeFile)
 
 if(ENABLE_TESTS)
-FetchContent_Declare(
-   	Catch2
-	URL https://github.com/catchorg/Catch2/archive/refs/tags/v3.4.0.zip
-	URL_HASH MD5=c426e77d4ee0055410bc930182959ae5
-	FIND_PACKAGE_ARGS
+	FetchContent_Declare(
+		Catch2
+		URL https://github.com/catchorg/Catch2/archive/refs/tags/v3.4.0.zip
+		URL_HASH MD5=c426e77d4ee0055410bc930182959ae5
+		FIND_PACKAGE_ARGS
 	)
 endif()
 
 FetchContent_Declare(
-   	cmark
+	cmark
 	URL https://github.com/commonmark/cmark/archive/refs/tags/0.30.3.zip
 	URL_HASH MD5=e806e6430ea49540f512ab98f32d4e2c
-	)
+)
 # @}
 
 # Avoid building Catch2 if unit tests aren't going to be built
@@ -77,7 +77,7 @@ if (ENABLE_TESTS)
 
 	if (TARGET Catch2WithMain)
 		set_target_properties(Catch2WithMain PROPERTIES CXX_STANDARD 17)
-endif()
+	endif()
 
 
 endif()
@@ -120,12 +120,12 @@ set_target_properties(
 	cmark PROPERTIES
 	C_STANDARD 17
 	C_EXTENSIONS ON
-	)
+)
 set_target_properties(
 	cmark_static PROPERTIES
 	C_STANDARD 17
 	C_EXTENSIONS ON
-	)
+)
 # @}
 
 if (USE_EXECINFO_STACKTRACE)
@@ -136,11 +136,11 @@ if (USE_EXECINFO_STACKTRACE)
 	endif()
 
 	find_library(LIB_EXEC_INFO
-    	NAMES execinfo  # Specify the library name without the 'lib' prefix or file extension
-    	HINTS /usr/lib /usr/local/lib  # Optional hint for the library location
+		NAMES execinfo  # Specify the library name without the 'lib' prefix or file extension
+		HINTS /usr/lib /usr/local/lib  # Optional hint for the library location
 	)
 	if (LIB_EXEC_INFO)
-   	   	message(STATUS "Found libexecinfo: ${LIB_EXEC_INFO}")
+		message(STATUS "Found libexecinfo: ${LIB_EXEC_INFO}")
 		set(STACKTRACE_DEP_LIBS ${LIB_EXEC_INFO})
 	endif()
 endif()
@@ -159,7 +159,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${custom_dbg_flags}")
 
 	if(USE_BOOST_STACKTRACE)
-		set(Boost_USE_STATIC_LIBS ON)
+		set(Boost_USE_STATIC_LIBS OFF)
 	endif()
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
 	set(custom_rel_flags "-Os")
@@ -176,14 +176,25 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
 endif()
 
 if(USE_BOOST_STACKTRACE)
+
 	set(Boost_USE_STATIC_RUNTIME OFF)  # Do not require static C++ runtime
 	set(Boost_USE_MULTITHREADED ON)
 	find_package(Boost 1.82.0 COMPONENTS system filesystem REQUIRED)
 endif()
 
 if (Boost_FOUND)
+	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DBOOST_STACKTRACE_USE_BACKTRACE")
+	elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DBOOST_STACKTRACE_USE_BACKTRACE")
+	endif()
+	find_library(LIB_BOOST_BACKTRACE
+		NAMES boost_stacktrace_backtrace
+		HINTS /usr/lib /usr/local/lib  # Optional hint for the library location
+	)
+
 	include_directories(${Boost_INCLUDE_DIRS})
-	set(STACKTRACE_DEP_LIBS  ${Boost_LIBRARIES})
+	set(STACKTRACE_DEP_LIBS  ${Boost_LIBRARIES} ${LIB_BOOST_BACKTRACE})
 endif()
 
 
