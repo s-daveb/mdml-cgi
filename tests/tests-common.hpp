@@ -21,7 +21,7 @@
 	static const char* TEST_SUITE_NAME = "[" name "]";                      \
 	namespace
 
-#define TEST(testname) TEST_CASE(#testname, TEST_SUITE_NAME)
+#define TEST(testname) TEST_CASE(testname, TEST_SUITE_NAME)
 
 #define TEST_WITH_FIXTURE(FixtureName, testname)                                \
 	TEST_CASE_METHOD(FixtureName, #testname, TEST_SUITE_NAME)

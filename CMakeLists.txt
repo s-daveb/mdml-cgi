@@ -194,9 +194,16 @@ add_custom_target(copy_assets
 add_subdirectory(src)
 add_subdirectory(apps)
 
-
 if (ENABLE_TESTS)
 	add_subdirectory(tests)
+
+	add_custom_target(ctest
+		COMMAND ctest -C $CONFIGURATION --test-dir ./tests --output-on-failure
+	)
+	add_dependencies(ctest
+		mdml-tests
+	)
+
 endif()
 
 # vim: ft=cmake sw=4 ts=4 noet sts=4 foldmethod=marker foldmarker=@{,@} :
