@@ -1,6 +1,6 @@
 
 # Add the test executable
-add_executable(mdml-tests exceptions-test.cpp)
+add_executable(mdml-tests exception-test.cpp)
 
 set_target_properties(mdml-tests PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/artifacts/tests"

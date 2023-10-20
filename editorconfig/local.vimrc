@@ -49,15 +49,21 @@ if ! get(s:, 'defined', 0) " -- prevents the function from being redefined after
 function! BuildDebug()
 	let s:defined = 1
 
+
 	wall
 
-	if (s:ninja_path == '')
+	if (s:ninja_path != '')
 		if (
 		\ (!filereadable(s:build_dir . '/CMakeCache.txt')) ||
 		\ (!filereadable(s:build_dir . '/build.ninja'))
 		\ )
+
+
 			exec ':Dispatch ' . s:cmake_call
 		endif
+		echo "found ninja"
+
+		sleep 5
 
 		set makeprg='ninja'
 		exec ':Make ' . s:make_args
