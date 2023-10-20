@@ -9,10 +9,11 @@
 
 #include "debuginfo.hpp"
 
-#ifdef HAVE_EXECINFO_H
+#if defined(HAVE_EXECINFO_H) && !defined(__linux__)
 #include <cxxabi.h>
 #include <execinfo.h>
 #else
+#define BOOST_STACKTRACER
 #include <boost/stacktrace.hpp>
 #endif
 
@@ -65,6 +66,7 @@ std::string
 generate_stacktrace(unsigned short framesToRemove)
 {
 	std::stringstream buffer;
+#ifndef BOOST_STACKTRACER
 	void* callstack[128];
 	int i, frames = backtrace(callstack, 128);
 	char** strs = backtrace_symbols(callstack, frames);
@@ -112,12 +114,12 @@ generate_stacktrace(unsigned short framesToRemove)
 				buffer << word << '\t';
 			}
 		}
-
 		buffer << std::endl;
 	}
-
 	std::free(strs);
-
+#else
+	buffer << boost::stacktrace::stacktrace() << std::flush;
+#endif
 	return buffer.str();
 }
 
