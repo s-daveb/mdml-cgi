@@ -18,14 +18,20 @@
 		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+		<script type="text/javascript">
+			$(document).ready(function () {
+    			$('[data-toggle="tooltip"]').tooltip();
+			});
+		</script>
 	</head>
-	<body class="m-leftright-auto body-style d-flex flex-column h-100">
+	<body class="leftright-automargin body-style d-flex flex-column h-100">
 		<header class="container">
-			<nav id="titlebar" class="navbar row center-text">
-      	<div class="col-lg-8 col-md-6 col-sm-8 navbar-brand logo _btn header-btn align-left">
+			<nav id="titlebar" class="navbar row row-cols-auto">
+      	<div class="col navbar-brand logo _btn header-btn left-align-text">
         	<a  href="#logo">S D Beniquez</a>
 				</div>
-				<div class="col-lg-4 col-md-6 col-sm-4">
+				<div class="col">
   				<div class="d-flex justify-content-end">
   					<div class="_btn header-btn source-btn center-text">
   						<a href="#gitea">Gitea</a>
@@ -37,7 +43,7 @@
 				</div>
 			</nav>
 			<nav id="navigation" class="navbar container center-text">
-				<div class="row row-cols-3 m-leftright-auto ">
+				<div class="row row-cols-3 leftright-automargin ">
         	<div class="col center-text _btn ">
         		<a href="home">Home</a>
       		</div>
@@ -55,12 +61,16 @@
       		</div>
       	</div>
   		</nav>
+			<div class="row page-title">
+				<div class="col-12">
+				<h2 class="center-text">Page Content</h2>
+				</div>
+			</div>
 		</header>
 		<div class="content container d-flex flex-column">
 			<div class="row">
 				<div class="col-12 align-self-start">
 					<main>
-						<h2 class="text-center">Page Content</h2>
 						<p>
 						Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 						Sed auctor non ante id facilisis. Suspendisse feugiat eros
@@ -75,12 +85,19 @@
 			</div>
 		</div>
 		<div class="container">
-			<footer class="navbar row row-cols-auto">
-				<div class="_btn align-left">
-					This site was built with <a href="#site-cpp">C++</a>.
+			<div class="row row-cols-auto  fineprint center-text">
+				<div class="col disclaimer">
+				The views represented on this site are my own and not my employers' or
+				my clients'.
 				</div>
-				<div class="_btn disclaimer align-right">
-					<a href="#disclaimer">Disclaimer</a>
+			</div>
+			<footer class="navbar credits tinyfont row justify-content-center">
+				<div class="credits col col-10 left-align-text align-self-start">
+					Copyright © 2023 Saul D. Beniquez 2023
+				</div>
+				<div class="allcaps col col-2 right-align-text align-self-end" >
+				<a href="credits" data-toggle="tooltip" data-placement="top"
+																								data-html="true" title="This site was built with C++</br>It uses Berkeley's Berkeley Mono font, and IBM's IBM Plex Sans font.<br/>Click here for more information.">Credits</a>
 				</div>
 			</footer>
 		</div>

@@ -186,8 +186,14 @@ if (Boost_FOUND)
 	set(STACKTRACE_DEP_LIBS  ${Boost_LIBRARIES})
 endif()
 
+
+add_custom_target(copy_assets
+	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/data ${CMAKE_BINARY_DIR}/artifacts/share/data
+)
+
 add_subdirectory(src)
 add_subdirectory(apps)
+
 
 if (ENABLE_TESTS)
 	add_subdirectory(tests)
