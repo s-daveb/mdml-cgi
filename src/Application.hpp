@@ -25,7 +25,7 @@ class Application {
 
 	virtual ~Application();
 
-	inline const std::vector<const std::string>& ArgumentsVector()
+	inline const std::vector<std::string>& ArgumentsVector()
 	{
 		return this->arguments;
 	}
@@ -42,7 +42,7 @@ class Application {
 	void parse_arguments(int argc, c::const_string argv[]);
 	void create_env_dictionary(c::const_string envp[]);
 
-	std::vector<const std::string> arguments;
+	std::vector<std::string> arguments;
 	Dictionary<const std::string> environment_variables;
 };
 }
