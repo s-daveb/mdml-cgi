@@ -12,6 +12,7 @@
 #include "types.hpp"
 
 #include <string>
+#include <vector>
 
 namespace mdml {
 
