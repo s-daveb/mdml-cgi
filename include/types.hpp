@@ -15,6 +15,12 @@
 #include <string>
 
 namespace mdml {
+namespace c {
+using string = char*;
+using const_string = const char*;
+}
+
+using count_t = size_t;
 
 template<typename T>
 using reference = std::reference_wrapper<T>;
@@ -29,7 +35,7 @@ template<typename T>
 using opt_const_reference = std::optional<const_reference<const T>>;
 
 template<typename value_t>
-using Dictionary = std::map<std::string, value_t>;
+using Dictionary = std::map<const std::string, value_t>;
 }
 
 // clang-format off

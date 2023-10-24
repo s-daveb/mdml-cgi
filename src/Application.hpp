@@ -17,14 +17,32 @@ namespace mdml {
 
 class Application {
     public:
-	explicit Application(int argc, char* argv[], char* env[]);
-	virtual ~Application() = default;
+	Application(int argc, c::const_string argv[], c::const_string env[]);
+
+	Application(const Application&) = delete;
+	Application& operator=(const Application&) = delete;
+
+	virtual ~Application();
+
+	inline const std::vector<const std::string>& ArgumentsVector()
+	{
+		return this->arguments;
+	}
+	inline const Dictionary<const std::string>& EnvironDictionary()
+	{
+		return this->environment_variables;
+	}
 
 	const std::string& GetEnv(const std::string& key);
 
     private:
-	void create_env_dictionary(char* env[]);
-	Dictionary<std::string> environment_variables;
+	static count_t instance_count;
+
+	void parse_arguments(int argc, c::const_string argv[]);
+	void create_env_dictionary(c::const_string envp[]);
+
+	std::vector<const std::string> arguments;
+	Dictionary<const std::string> environment_variables;
 };
 }
 

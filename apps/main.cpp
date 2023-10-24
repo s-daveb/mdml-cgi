@@ -8,6 +8,7 @@
  */
 
 #include "Application.hpp"
+#include "types.hpp"
 
 #include <iomanip>
 #include <iostream>
@@ -15,9 +16,9 @@
 #include <string>
 
 int
-main(int argc, char** argv, char** envp)
+main(int argc, const char** argv, const char** envp)
 {
-	mdml::Application app(argc, argv, envp);
+
 	for (int i = 0; i < argc; ++i) {
 		std::cout << argv[i] << std::endl;
 	}

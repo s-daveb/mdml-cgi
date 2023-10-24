@@ -8,6 +8,7 @@
  */
 
 #include "Application.hpp"
+#include "exception.hpp"
 
 #include <map>
 #include <string>
@@ -15,16 +16,37 @@
 
 using namespace mdml;
 
-Application::Application(int argc, char* argv[], char* env[])
+count_t Application::instance_count = 0;
+
+Application::Application(int argc, c::const_string argv[], c::const_string env[])
+    : arguments(), environment_variables()
 {
+	if (Application::instance_count != 0) {
+		auto fatal_exception =
+		    std::logic_error("Cannot instantiate more than one "
+		                     "mdml::Application class at a time");
+		throw mdml::exception(fatal_exception);
+	}
+
+	if (argv == nullptr || env == nullptr) {
+		std::string problem = (argv == nullptr) ? "argv " : "envp ";
+		auto message = "Cannot instantiate the application class "
+		               "with null " +
+		               problem + "parameter";
+
+		auto fatal_exception = std::logic_error(message);
+		throw mdml::exception(fatal_exception);
+	}
+
+	++(Application::instance_count);
+	this->parse_arguments(argc, argv);
 	this->create_env_dictionary(env);
 }
 
-/* For future use, in case the default constructor is not good enough
 Application::~Application()
 {
-
-} */
+	(Application::instance_count)--;
+}
 
 const std::string&
 Application::GetEnv(const std::string& key)
@@ -33,18 +55,34 @@ Application::GetEnv(const std::string& key)
 }
 
 void
-Application::create_env_dictionary(char* env[])
+Application::parse_arguments(int argc, c::const_string argv[])
 {
-	for (auto** current = env; (*current) != 0; ++current) {
-		auto encoded_pair = std::string_view(*env);
-		std::string key, value;
+	for (count_t index = 0; index < argc; ++index) {
+		this->arguments.push_back(argv[index]);
+	}
+}
+
+void
+Application::create_env_dictionary(c::const_string envp[])
+{
+	for (count_t num = 0; envp[num] != nullptr; ++num) {
+		auto encoded_pair = std::string_view(envp[num]);
+
 		size_t equal_character_pos;
+		auto not_found = encoded_pair.npos;
 
 		equal_character_pos = encoded_pair.find('=');
-		if (equal_character_pos != encoded_pair.npos) {
-			key = encoded_pair.substr(0, equal_character_pos);
-			value = encoded_pair.substr(equal_character_pos + 1);
-			this->environment_variables[key] = value;
+		if (equal_character_pos != not_found) {
+			auto key = std::string(
+			    encoded_pair.substr(0, equal_character_pos)
+			);
+			auto val = std::string(
+			    encoded_pair.substr(equal_character_pos + 1)
+			);
+
+			this->environment_variables.insert(
+			    std::make_pair(key, val)
+			);
 		}
 	}
 }
