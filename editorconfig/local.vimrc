@@ -49,7 +49,6 @@ if ! get(s:, 'defined', 0) " -- prevents the function from being redefined after
 function! BuildDebug()
 	let s:defined = 1
 
-
 	wall
 
 	if (s:ninja_path != '')
@@ -83,9 +82,44 @@ function! BuildDebug()
 	endif
 
 endfunction
+
+function RunTests()
+	let s:defined = 1
+	if (s:ninja_path != '')
+		if (
+		\ (!filereadable(s:build_dir . '/CMakeCache.txt')) ||
+		\ (!filereadable(s:build_dir . '/build.ninja'))
+		\ )
+
+
+			exec ':Dispatch ' . s:cmake_call
+		endif
+
+		set makeprg='ninja'
+		exec ':Make ' . s:make_args. ' ctest'
+	else
+		if (
+		\ (!filereadable(s:build_dir . '/CMakeCache.txt')) ||
+		\ (!filereadable(s:build_dir . '/Makefile'))
+		\ )
+			exec ':Dispatch ' . s:cmake_call
+		endif
+
+		if exists(':Make')
+			exec ':Make ' . s:make_args . ' ctest'
+			cd ..
+		else
+			exec 'make ' . s:make_args . ' ctest'
+			vert botright copen
+			vert resize +100
+		endif
+	endif
+
+endfunction
 endif
 
 nnoremap <leader>bd :call BuildDebug()<CR>
+nnoremap <leader>rt :call RunTests()<CR>
 
 set path+=src
 set path+=include
