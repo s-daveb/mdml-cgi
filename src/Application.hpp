@@ -25,20 +25,25 @@ class Application {
 
 	virtual ~Application();
 
-	inline const std::vector<std::string>& ArgumentsVector()
+	// #region Getters
+	inline const std::vector<std::string>& Arguments()
 	{
 		return this->arguments;
 	}
-	inline const Dictionary<const std::string>& EnvironDictionary()
+	inline const Dictionary<const std::string>& Environment()
 	{
 		return this->environment_variables;
 	}
 
-	const std::string& GetEnv(const std::string& key);
+	inline const std::string& GetEnv(const std::string& key)
+	{
+		return this->environment_variables[key];
+	} /* #endregion */
 
     private:
 	static count_t instance_count;
 
+    protected:
 	void parse_arguments(int argc, c::const_string argv[]);
 	void create_env_dictionary(c::const_string envp[]);
 

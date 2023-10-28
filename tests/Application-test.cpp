@@ -12,12 +12,14 @@
 
 #include "Application.hpp"
 
-struct invoke_data {
+struct simulated_launch {
 	static const char* argv[];
 	static const char* env[];
 };
-inline const char* invoke_data::argv[] = { "param1", "param2", "param3" };
-inline const char* invoke_data::env[] = { "PATH=/usr/bin", "VAR2=TWO", nullptr };
+inline const char* simulated_launch::argv[] = { "param1", "param2", "param3" };
+inline const char* simulated_launch::env[] = { "PATH=/usr/bin",
+	                                       "VAR2=TWO",
+	                                       nullptr };
 
 BEGIN_TEST_SUITE("Application-test")
 {
@@ -25,15 +27,15 @@ BEGIN_TEST_SUITE("Application-test")
 	{
 		auto simple_construction = []() {
 			auto test_object = mdml::Application(
-			    3, invoke_data::argv, invoke_data::env
+			    3, simulated_launch::argv, simulated_launch::env
 			);
 		};
 		auto double_construction = []() {
 			auto test_object = mdml::Application(
-			    3, invoke_data::argv, invoke_data::env
+			    3, simulated_launch::argv, simulated_launch::env
 			);
 			auto throws_errors = mdml::Application(
-			    3, invoke_data::argv, invoke_data::env
+			    3, simulated_launch::argv, simulated_launch::env
 			);
 		};
 
@@ -71,9 +73,11 @@ BEGIN_TEST_SUITE("Application-test")
 		{
 			auto correct_construction = []() {
 				auto test_object = mdml::Application(
-				    3, invoke_data::argv, invoke_data::env
+				    3,
+				    simulated_launch::argv,
+				    simulated_launch::env
 				);
-				auto args_list = test_object.ArgumentsVector();
+				auto args_list = test_object.Arguments();
 
 				SECTION("Argument verification")
 				{
@@ -87,9 +91,11 @@ BEGIN_TEST_SUITE("Application-test")
 		{
 			auto correct_construction = []() {
 				auto test_object = mdml::Application(
-				    3, invoke_data::argv, invoke_data::env
+				    3,
+				    simulated_launch::argv,
+				    simulated_launch::env
 				);
-				auto environ = test_object.EnvironDictionary();
+				auto environ = test_object.Environment();
 
 				SECTION("Varaible verification")
 				{

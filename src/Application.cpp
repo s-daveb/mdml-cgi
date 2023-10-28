@@ -49,12 +49,6 @@ Application::~Application()
 	(Application::instance_count)--;
 }
 
-const std::string&
-Application::GetEnv(const std::string& key)
-{
-	return this->environment_variables[key];
-}
-
 void
 Application::parse_arguments(int argc, c::const_string argv[])
 {
