@@ -13,6 +13,7 @@
 #include <map>
 #include <optional>
 #include <string>
+#include <utility>
 
 namespace mdml {
 namespace c {
@@ -20,6 +21,7 @@ using string = char*;
 using const_string = const char*;
 }
 
+enum error_t : bool { NO_ERROR = false, ERROR = true };
 using count_t = size_t;
 
 template<typename T>
@@ -37,6 +39,8 @@ using opt_const_reference = std::optional<const_reference<const T>>;
 template<typename value_t>
 using Dictionary = std::map<const std::string, value_t>;
 }
+
+#include "types/Result.hpp"
 
 // clang-format off
 // vim: set foldmethod=marker foldmarker=#region,#endregion textwidth=80 ts=8 sts=0 sw=8  noexpandtab ft=cpp.doxygen :

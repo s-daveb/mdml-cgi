@@ -109,4 +109,4 @@ BEGIN_TEST_SUITE("Application-test")
 }
 
 // clang-format off
-// vim: set foldmethod=marker foldmarker=#region,#endregion textwidth=80 ts=8 sts=0 sw=8  noexpandtab ft=cpp.doxygen :
+// vim: set foldmethod=syntax foldlevel=1000 textwidth=80 ts=8 sts=0 sw=8  noexpandtab ft=cpp.doxygen :

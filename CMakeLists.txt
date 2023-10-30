@@ -34,6 +34,10 @@ project(mdml
 	DESCRIPTION "A CGI script written in C++ that converts markdown to HTML"
 )
 
+IF( NOT CMAKE_BUILD_TYPE )
+   SET( CMAKE_BUILD_TYPE Release ... FORCE )
+ENDIF()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_EXTENSIONS OFF)
@@ -145,7 +149,11 @@ if (USE_EXECINFO_STACKTRACE)
 	endif()
 endif()
 
-include_directories(${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/include)
+include_directories(
+	${CMAKE_SOURCE_DIR}/src
+	${CMAKE_SOURCE_DIR}/include
+	${CMAKE_SOURCE_DIR}/include/private
+)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/artifacts/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/artifacts/lib)
@@ -176,18 +184,15 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
 endif()
 
 if(USE_BOOST_STACKTRACE)
-
 	set(Boost_USE_STATIC_RUNTIME OFF)  # Do not require static C++ runtime
 	set(Boost_USE_MULTITHREADED ON)
 	find_package(Boost 1.82.0 COMPONENTS system filesystem REQUIRED)
 endif()
 
 if (Boost_FOUND)
-	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DBOOST_STACKTRACE_USE_BACKTRACE")
-	elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DBOOST_STACKTRACE_USE_BACKTRACE")
-	endif()
+
+	add_definitions(-DBOOST_STACKTRACE_USE_BACKTRACE=1)
+
 	find_library(LIB_BOOST_BACKTRACE
 		NAMES boost_stacktrace_backtrace
 		HINTS /usr/lib /usr/local/lib  # Optional hint for the library location
