@@ -18,14 +18,21 @@
 using namespace mdml;
 
 count_t Application::instance_count = 0;
+Application* Application::instance_ptr = nullptr;
 
 Application::Application(int argc, c::const_string argv[], c::const_string env[])
     : arguments(), environment_variables()
 {
 	if (Application::instance_count != 0) {
-		auto fatal_exception =
-		    std::logic_error("Cannot instantiate more than one "
-		                     "mdml::Application class at a time");
+		std::stringstream buffer;
+		buffer << this->instance_count;
+
+		auto fatal_exception = std::logic_error(
+		    "Cannot instantiate more than one "
+		    "mdml::Application class at a time.\n"
+		    "	instance_count = " +
+		    buffer.str()
+		);
 		throw mdml::exception(fatal_exception);
 	}
 
@@ -42,11 +49,14 @@ Application::Application(int argc, c::const_string argv[], c::const_string env[]
 	++(Application::instance_count);
 	this->parse_arguments(argc, argv);
 	this->create_env_dictionary(env);
+
+	Application::instance_ptr = this;
 }
 
 Application::~Application()
 {
-	(Application::instance_count)--;
+	--(Application::instance_count);
+	Application::instance_ptr = nullptr;
 }
 
 void

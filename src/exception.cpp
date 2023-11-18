@@ -26,7 +26,17 @@ constexpr unsigned DEFAULT_STACKFRAMES_TO_STRIP = 2;
 
 // Helper classes and functions. #region
 
-exception::exception(const char* error_message)
+exception::exception(c::const_string error_message)
+    : std::exception()
+    , error_message(error_message)
+    , what_message()
+    , stack_trace(mdml::generate_stacktrace(DEFAULT_STACKFRAMES_TO_STRIP))
+    , inner_exception_ptr()
+{
+	build_what_message();
+}
+
+exception::exception(const std::string& error_message)
     : std::exception()
     , error_message(error_message)
     , what_message()

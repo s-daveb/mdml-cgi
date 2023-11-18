@@ -205,6 +205,7 @@ endif()
 
 add_custom_target(copy_assets
 	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/data ${CMAKE_BINARY_DIR}/artifacts/share/data
+	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/data ${CMAKE_BINARY_DIR}/tests/data
 )
 
 add_subdirectory(src)
@@ -218,6 +219,7 @@ if (ENABLE_TESTS)
 	)
 	add_dependencies(ctest
 		mdml-tests
+		copy_assets
 	)
 
 endif()

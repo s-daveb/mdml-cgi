@@ -24,9 +24,9 @@
 #define TEST(testname) TEST_CASE(testname, TEST_SUITE_NAME)
 
 #define TEST_WITH_FIXTURE(FixtureName, testname)                                \
-	TEST_CASE_METHOD(FixtureName, #testname, TEST_SUITE_NAME)
+	TEST_CASE_METHOD(FixtureName, testname, TEST_SUITE_NAME)
 
-#define FIXTURE_TEST(testname) TEST_WITH_FIXTURE(TestFixture, #testname)
+#define FIXTURE_TEST(testname) TEST_WITH_FIXTURE(TestFixture, testname)
 
 #ifdef VIM_COMPLETION
 #define UNIT_TEST 1

@@ -6,6 +6,7 @@ set(MDML_TEST_SOURCE_LIST
 	Result-test.cpp
 	Application-test.cpp
 	CgiApplication-test.cpp
+	MarkdownRouteHandler-test.cpp
 )
 
 add_executable(mdml-tests

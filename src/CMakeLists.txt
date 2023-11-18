@@ -5,6 +5,7 @@ set(LIBMDML_SOURCES
 	debuginfo.cpp
 	Application.cpp
 	CgiApplication.cpp
+	MarkdownRouteHandler.cpp
 )
 
 set(LIBMDML_LINK_LIBS ${STACKTRACE_DEP_LIBS})

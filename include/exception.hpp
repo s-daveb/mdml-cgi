@@ -24,7 +24,8 @@ namespace mdml {
 class exception : public std::exception {
 
     public:
-	exception(const char* error_message = default_error);
+	exception(c::const_string _message = default_error);
+	exception(const std::string& message);
 	exception(const std::exception& inner);
 
 	exception& operator=(const exception&) = delete;

@@ -12,6 +12,9 @@
 
 #include "Application.hpp"
 
+#include <functional>
+#include <optional>
+
 struct simulated_launch {
 	static const char* argv[];
 	static const char* env[];
@@ -21,9 +24,12 @@ inline const char* simulated_launch::env[] = { "PATH=/usr/bin",
 	                                       "VAR2=TWO",
 	                                       nullptr };
 
+template<typename T>
+using opt_reference = std::optional<std::reference_wrapper<T>>;
+
 BEGIN_TEST_SUITE("Application-test")
 {
-	TEST("Class construction")
+	TEST("Application Class construction")
 	{
 		auto simple_construction = []() {
 			auto test_object = mdml::Application(
@@ -49,11 +55,19 @@ BEGIN_TEST_SUITE("Application-test")
 			    double_construction(), mdml::exception
 			);
 		}
-		SECTION("Double construction")
+		SECTION("Get existing instance")
 		{
-			REQUIRE_THROWS_AS(
-			    double_construction(), mdml::exception
-			);
+			opt_reference<mdml::Application> app;
+			try {
+				auto test_object = mdml::Application(
+				    3,
+				    simulated_launch::argv,
+				    simulated_launch::env
+				);
+				app = test_object;
+			} catch (const mdml::exception& e) {
+				app = mdml::Application::GetInstance();
+			}
 		}
 		auto incorrect_construction = []() {
 			mdml::Application obj(0, nullptr, nullptr);
@@ -67,7 +81,7 @@ BEGIN_TEST_SUITE("Application-test")
 		}
 	}
 
-	TEST("Parameter capture")
+	TEST("Application Parameter capture")
 	{
 		SECTION("Arguments are captured in vector")
 		{

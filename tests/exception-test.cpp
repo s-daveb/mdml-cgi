@@ -23,7 +23,7 @@ namespace Match = Catch::Matchers;
 using Catch::CaseSensitive;
 
 void
-throw_local_variable()
+throw_local_exception()
 {
 	auto local = std::logic_error("This is a stack variable");
 
@@ -48,10 +48,15 @@ BEGIN_TEST_SUITE("mdml::exception")
 		{
 			mdml::exception obj;
 		}
-		SECTION("2. With string parameter")
+		SECTION("2a. With cstring parameter")
 		{
 			mdml::exception obj("Sample Error");
 		}
+		SECTION("2b. With std::string parameter")
+		{
+			mdml::exception obj(std::string("Sample Error"));
+		}
+
 		SECTION("3. With STL exception")
 		{
 			mdml::exception obj(std::runtime_error("Sample Error"));
@@ -59,7 +64,7 @@ BEGIN_TEST_SUITE("mdml::exception")
 		SECTION("4. With destroyed stack")
 		{
 			auto nested_function_call = []() {
-				throw_local_variable();
+				throw_local_exception();
 			};
 			try {
 				nested_function_call();

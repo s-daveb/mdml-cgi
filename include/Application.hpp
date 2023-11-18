@@ -23,6 +23,7 @@ class Application {
 	Application(const Application&) = delete;
 	Application& operator=(const Application&) = delete;
 
+	inline static Application& GetInstance() { return *instance_ptr; };
 	virtual ~Application();
 
 	// #region Getters
@@ -42,6 +43,7 @@ class Application {
 
     private:
 	static count_t instance_count;
+	static Application* instance_ptr;
 
     protected:
 	void parse_arguments(int argc, c::const_string argv[]);

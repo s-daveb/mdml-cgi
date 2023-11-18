@@ -43,10 +43,14 @@ CgiApplication::~CgiApplication()
 Result<std::string>
 CgiApplication::ProcessRequest()
 {
-	auto& environment = Application::environment_variables;
+	try {
+		auto& environment = Application::environment_variables;
 
-	// Check if REQUEST_URI is in the environment map
-	if (environment.find("REQUEST_URI") != environment.end()) {
+		// Check if REQUEST_URI is in the environment map
+		if (environment.find("REQUEST_URI") == environment.end()) {
+			throw mdml::exception("No REQUEST_URI in Environment!");
+		}
+		/* Parse REQUEST_URI to get the route's basename */
 		auto request_URI = environment["REQUEST_URI"];
 		auto question_pos = request_URI.find('?');
 		auto ampersand_pos = request_URI.find('&');
@@ -59,26 +63,29 @@ CgiApplication::ProcessRequest()
 			}
 		}
 		if (question_pos != not_found) {
-			page_name =
-			    request_URI.substr(question_pos, std::string::npos);
+			page_name = request_URI.substr(0, question_pos);
 		}
 		if (routes.find(page_name) != routes.end()) {
 			auto route_handler = routes[page_name];
 			auto result =
 			    route_handler->Process(page_name, request_URI);
 
-			if (!result.IsError) {
+			if (result.IsError) {
 				auto except =
 				    mdml::exception(result.ErrorData.c_str());
 				throw except;
 			}
+
+			return result;
 		} else {
 			std::stringstream buffer;
-			buffer << "Unknown route: " << request_URI << std::endl;
-			throw mdml::exception(buffer.str().c_str());
+			buffer << "Unknown route: " << page_name << std::endl;
+			return { ERROR, buffer.str() };
+			// throw mdml::exception(buffer.str().c_str());
 		}
+	} catch (const std::exception& except) {
+		throw mdml::exception(except);
 	}
-	return { NO_ERROR, "Success" };
 }
 
 // clang-format off
