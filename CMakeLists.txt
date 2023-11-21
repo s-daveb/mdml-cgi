@@ -27,6 +27,7 @@ else()
 endif()
 
 
+
 project(mdml
 	VERSION 0.1
 	LANGUAGES C CXX
@@ -56,6 +57,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS On)
 include(FetchContent)
 include(CheckIncludeFile)
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(cmark libcmark)
+
+if (cmark_FOUND)
+	set(USE_SYSTEM_CMARK True)
+endif()
+
+# @{ Enable unit testing framework only if needed 
 if(ENABLE_TESTS)
 	FetchContent_Declare(
 		Catch2
@@ -64,12 +73,9 @@ if(ENABLE_TESTS)
 		FIND_PACKAGE_ARGS
 	)
 endif()
+# @}
 
-FetchContent_Declare(
-	cmark
-	URL https://github.com/commonmark/cmark/archive/refs/tags/0.30.3.zip
-	URL_HASH MD5=e806e6430ea49540f512ab98f32d4e2c
-)
+
 # @}
 
 # Avoid building Catch2 if unit tests aren't going to be built
@@ -82,55 +88,68 @@ if (ENABLE_TESTS)
 	if (TARGET Catch2WithMain)
 		set_target_properties(Catch2WithMain PROPERTIES CXX_STANDARD 17)
 	endif()
-
-
 endif()
 
-# FetchContent: cmark @{
-# Instead of calling FetchContent_MakeAvailable, use a more manual way
-# to import cmark's build targets
-# The official cmark repo builds unit ests by default, which we don't need here.
-# cmarktests also use a deprecated FindPython  modules that cause the build
-# to spit out warnings.
+# @{ Download cmark from github if it's not installed locally
+if (NOT cmark_FOUND)
+	set(USE_SYSTEM_CMARK False)
+	set(CMARK_STATIC_LINKAGE True)
 
-# Step 1. Import the build variables from cmark
-FetchContent_GetProperties(cmark)
+	# FetchContent: cmark @{
+	# Instead of calling FetchContent_MakeAvailable, use a more manual way
+	# to import cmark's build targets
+	FetchContent_Declare(
+		cmark
+		URL https://github.com/commonmark/cmark/archive/refs/tags/0.30.3.zip
+		URL_HASH MD5=e806e6430ea49540f512ab98f32d4e2c
+	)
 
-# Step 2. Set Dependency options @{
-# cmark's cmake uses very deprecated functions for unit tests, and hence
-# cannot be imported with FetchContent_MakeAvailable.  A different process
-# has to be used to disable the broken build targets.
-if (NOT cmark_POPULATED)            # if build targets not populated
+	# The official cmark repo builds unit ests by default, which we don't need here.
+	# cmarktests also use a deprecated FindPython  modules that cause the build
+	# to spit out warnings.
 
-	# Since these properties are /options/ of cmark, they need to be overriden
-	# at the CmakeCache.txt level, hence the CACHE INTERNAL keywords
+	# Step 1. Import the build variables from cmark
+	FetchContent_GetProperties(cmark)
 
-	# Enable shared lib and static lib build for flexibility
-	set(CMARK_SHARED ON CACHE INTERNAL "Turn on shared lib")
-	set(CMARK_STATIC ON CACHE INTERNAL "Turn on static lib")
+	# Step 2. Set Dependency options @{
+	# cmark's cmake uses very deprecated functions for unit tests, and hence
+	# cannot be imported with FetchContent_MakeAvailable.  A different process
+	# has to be used to disable the broken build targets.
+	if (NOT cmark_POPULATED)            # if build targets not populated
 
-	#  disable cmark unit tests that use deprecated features.
-	set(CMARK_TESTS OFF CACHE INTERNAL "Turn off tests")
+		# Since these properties are /options/ of cmark, they need to be overriden
+		# at the CmakeCache.txt level, hence the CACHE INTERNAL keywords
 
+		# Enable shared lib and static lib build for flexibility
+		set(CMARK_SHARED ON CACHE INTERNAL "Turn on shared lib")
+		set(CMARK_STATIC ON CACHE INTERNAL "Turn on static lib")
 
-	FetchContent_Populate(cmark)    # populate remaining build targets
-	# Add cmark build targets to this project
-	add_subdirectory(${cmark_SOURCE_DIR} ${cmark_BINARY_DIR})
-endif() # end Step 2. @}
-# @}
+		#  disable cmark unit tests that use deprecated features.
+		set(CMARK_TESTS OFF CACHE INTERNAL "Turn off tests")
 
-# Set compiler standards for dependencies
-set_target_properties(
-	cmark PROPERTIES
-	C_STANDARD 17
-	C_EXTENSIONS ON
-)
-set_target_properties(
-	cmark_static PROPERTIES
-	C_STANDARD 17
-	C_EXTENSIONS ON
-)
-# @}
+		FetchContent_Populate(cmark)    # populate remaining build targets
+		# Add cmark build targets to this project
+		add_subdirectory(${cmark_SOURCE_DIR} ${cmark_BINARY_DIR})
+ 	 # end Step 2. @}
+
+	# Set compiler standards for dependencies
+	set_target_properties(
+		cmark PROPERTIES
+		C_STANDARD 17
+		C_EXTENSIONS ON
+	)
+	set_target_properties(
+		cmark_static PROPERTIES
+		C_STANDARD 17
+		C_EXTENSIONS ON
+	)
+	endif(NOT cmark_POPULATED) # @}
+endif(NOT cmark_FOUND) # @}
+
+if (USE_SYSTEM_CMARK)
+	include_directories(${cmark_INCLUDE_DIRS})
+	link_directories(${cmark_LIBRARY_DIRS})
+endif()
 
 if (USE_EXECINFO_STACKTRACE)
 	CHECK_INCLUDE_FILE("execinfo.h" HAVE_EXECINFO_H)
@@ -166,9 +185,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${custom_dbg_flags}")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${custom_dbg_flags}")
 
-	if(USE_BOOST_STACKTRACE)
-		set(Boost_USE_STATIC_LIBS OFF)
-	endif()
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
 	set(custom_rel_flags "-Os")
 
@@ -177,20 +193,16 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
 		CMAKE_CXX_FLAGS_RELEASE
 		"${CMAKE_CXX_FLAGS_RELEASE} ${custom_rel_flags}"
 	)
-
-	if(USE_BOOST_STACKTRACE)
-		set(Boost_USE_STATIC_LIBS OFF)
-	endif()
 endif()
 
 if(USE_BOOST_STACKTRACE)
+		set(Boost_USE_STATIC_LIBS OFF)
 	set(Boost_USE_STATIC_RUNTIME OFF)  # Do not require static C++ runtime
 	set(Boost_USE_MULTITHREADED ON)
-	find_package(Boost 1.82.0 COMPONENTS system filesystem REQUIRED)
+	find_package(Boost 1.82.0 COMPONENTS system filesystem REQUIREDhttps://www.npr.org/sections/codeswitch/2017/08/30/547013468/im-not-racist-im-argentine)
 endif()
 
 if (Boost_FOUND)
-
 	add_definitions(-DBOOST_STACKTRACE_USE_BACKTRACE=1)
 
 	find_library(LIB_BOOST_BACKTRACE
