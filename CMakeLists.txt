@@ -203,15 +203,9 @@ if(USE_BOOST_STACKTRACE)
 endif()
 
 if (Boost_FOUND)
-	add_definitions(-DBOOST_STACKTRACE_USE_BACKTRACE=1)
-
-	find_library(LIB_BOOST_BACKTRACE
-		NAMES boost_stacktrace_backtrace
-		HINTS /usr/lib /usr/local/lib  # Optional hint for the library location
-	)
+	add_definitions(-DBOOST_STACKTRACE_USE_ADDR2LINE=1)
 
 	include_directories(${Boost_INCLUDE_DIRS})
-	set(STACKTRACE_DEP_LIBS  ${Boost_LIBRARIES} ${LIB_BOOST_BACKTRACE})
 endif()
 
 

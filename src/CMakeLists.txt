@@ -32,12 +32,20 @@ target_compile_definitions(mdml_test PRIVATE -DTESTING)
 
 if (NOT CMARK_STATIC_LINKAGE)
 	target_link_libraries(mdml PRIVATE cmark)
-	target_link_libraries(mdml PRIVATE cmark)
+	target_link_libraries(mdml_static PRIVATE cmark)
 	target_link_libraries(mdml_test PRIVATE cmark)
 else()
 	target_link_libraries(mdml PRIVATE cmark_static)
 	target_link_libraries(mdml_static PRIVATE cmark_static)
 	target_link_libraries(mdml_test PRIVATE cmark_static)
+endif()
+
+# Check if the system is Linux
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    # Add the -rdynamic linker option
+    target_link_options(mdml PUBLIC -rdynamic)
+    target_link_options(mdml_static PUBLIC -rdynamic)
+    target_link_options(mdml_test PUBLIC -rdynamic)
 endif()
 
 target_link_libraries(mdml PRIVATE ${LIBMDML_LINK_LIBS})
