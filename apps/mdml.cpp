@@ -50,7 +50,7 @@ main(int argc, const char* argv[], const char* envp[])
 		auto markdown_routes =
 		    mdml::MarkdownRouteHandler::GenerateRoutes(
 			"/usr/local/www/content",
-			"/usr/local/www/templates/main.thmtl"
+			"/usr/local/www/templates/main.thtml"
 		    );
 
 		app.ImportRoutes(markdown_routes);
