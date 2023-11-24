@@ -75,6 +75,10 @@ generate_stacktrace(unsigned short framesToRemove)
 		columns_to_print = 4;
 	}
 
+	if (framesToRemove == frames) {
+		framesToRemove = 0;
+	}
+
 	for (i = framesToRemove; i < frames; ++i) {
 		std::string word;
 		std::stringstream line_stream(strs[i]);
