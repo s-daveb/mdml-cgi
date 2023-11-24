@@ -7,14 +7,55 @@
  * obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-
+#include "CgiApplication.hpp"
 #include "libmdml.hpp"
+#include "types.hpp"
 
-int main(int argc, char *argv[])
-{
-	return 0;
+#include <functional>
+#include <iostream>
+#include <optional>
+#include <string>
+
+namespace {
+using string_result = mdml::Result<std::string>;
 }
 
+int
+handle_error(
+    const string_result* error_data = nullptr,
+    const std::exception* except = nullptr
+)
+{
+	auto result = 0;
+	std::cerr << "An error occurred" << std::endl;
+	if (error_data && error_data->IsError) {
+		std::cerr << error_data->ErrorData << std::endl;
+		result |= 0x001;
+	}
+
+	if (except) {
+		std::cerr << except->what() << std::endl;
+		result |= 0x010;
+	}
+
+	return result;
+}
+int
+main(int argc, const char* argv[], const char* envp[])
+{
+	auto app = mdml::CgiApplication(argc, argv, envp);
+
+	try {
+		auto result = app.ProcessRequest();
+
+		if (result.IsError) {
+			return handle_error(&result);
+		}
+	} catch (std::exception& except) {
+		return handle_error(nullptr, &except);
+	}
+	return 0;
+}
 
 // clang-format off
 // vim: set foldmethod=marker foldmarker=#region,#endregion textwidth=80 ts=8 sts=0 sw=8  noexpandtab ft=cpp.doxygen :

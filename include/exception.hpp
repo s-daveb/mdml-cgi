@@ -26,6 +26,8 @@ class exception : public std::exception {
     public:
 	exception(c::const_string _message = default_error);
 	exception(const std::string& message);
+
+	exception(const mdml::exception& other) = default;
 	exception(const std::exception& inner);
 
 	exception& operator=(const exception&) = delete;

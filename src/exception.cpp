@@ -22,7 +22,7 @@
 
 using mdml::exception;
 
-constexpr unsigned DEFAULT_STACKFRAMES_TO_STRIP = 2;
+constexpr unsigned DEFAULT_STACKFRAMES_TO_STRIP = 3;
 
 // Helper classes and functions. #region
 
@@ -91,20 +91,19 @@ void
 exception::build_what_message()
 {
 	std::stringstream buffer;
+
+	this->what_message = error_message;
+
 	std::string indented_stacktrace =
 	    prepend_tabs_to_lines(this->stack_trace);
 
-	buffer << "mdml::exception::what(): { " << std::endl;
+	buffer << "mdml::exception::what(): { " << std::endl
+	       << "\terror: " << error_message.c_str() << std::endl
+	       << "\tstack_trace: " << std::endl
+	       << indented_stacktrace << std::endl
+	       << "};" << std::endl;
 
-	buffer << "	error: " << error_message << std::endl;
-
-	buffer << std::endl;
-
-	buffer << "	stack_trace: " << std::endl
-	       << indented_stacktrace << std::endl;
-
-	buffer << "}; " << std::endl;
-	what_message = buffer.str();
+	this->what_message = buffer.str().c_str();
 }
 
 // clang-format off

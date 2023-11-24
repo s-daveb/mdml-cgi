@@ -83,6 +83,8 @@ CgiApplication::ProcessRequest()
 			return { ERROR, buffer.str() };
 			// throw mdml::exception(buffer.str().c_str());
 		}
+	} catch (const mdml::exception& except) {
+		throw except;
 	} catch (const std::exception& except) {
 		throw mdml::exception(except);
 	}

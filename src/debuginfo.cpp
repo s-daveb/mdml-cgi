@@ -116,9 +116,9 @@ generate_stacktrace(unsigned short framesToRemove)
 		buffer << std::endl;
 	}
 	std::free(strs);
-#else
+#else  /*@{*/
 	buffer << boost::stacktrace::stacktrace() << std::flush;
-#endif
+#endif /*@}*/
 	return buffer.str();
 }
 
