@@ -8,6 +8,7 @@
  */
 
 #include "CgiApplication.hpp"
+#include "MarkdownRouteHandler.hpp"
 #include "libmdml.hpp"
 #include "types.hpp"
 
@@ -43,9 +44,17 @@ handle_error(
 int
 main(int argc, const char* argv[], const char* envp[])
 {
-	auto app = mdml::CgiApplication(argc, argv, envp);
 
 	try {
+		auto app = mdml::CgiApplication(argc, argv, envp);
+		auto markdown_routes =
+		    mdml::MarkdownRouteHandler::GenerateRoutes(
+			"/usr/local/www/content",
+			"/usr/local/www/templates/main.thmtl"
+		    );
+
+		app.ImportRoutes(markdown_routes);
+
 		auto result = app.ProcessRequest();
 
 		if (result.IsError) {

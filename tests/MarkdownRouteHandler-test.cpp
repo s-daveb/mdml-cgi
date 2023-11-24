@@ -40,6 +40,19 @@ BEGIN_TEST_SUITE("MarkdownRouteHandler Unit Tests")
 		REQUIRE_NOTHROW([]() { MarkdownRouteHandler test; }());
 	}
 
+	TEST("MarkdownRouteHandler Static Route Generator")
+	{
+
+		REQUIRE_NOTHROW([]() {
+			auto routes = MarkdownRouteHandler::GenerateRoutes(
+			    "content", "templates/main.thtml"
+			);
+
+			REQUIRE(routes.size() > 0);
+			REQUIRE(routes.begin()->first == "test");
+		}());
+	}
+
 	struct TestFixture {
 		MarkdownRouteHandler test_obj;
 	};
@@ -51,7 +64,7 @@ BEGIN_TEST_SUITE("MarkdownRouteHandler Unit Tests")
 		SECTION("File exists")
 		{
 			REQUIRE_NOTHROW([&]() {
-				test_obj.LoadTemplate("data/test.thtml");
+				test_obj.LoadTemplate("templates/main.thtml");
 			}());
 
 			REQUIRE(false == test_obj.GetHtmlData().empty());
@@ -59,7 +72,7 @@ BEGIN_TEST_SUITE("MarkdownRouteHandler Unit Tests")
 		SECTION("File does not exists")
 		{
 			REQUIRE_THROWS([&]() {
-				test_obj.LoadTemplate("not-found.txt");
+				test_obj.LoadTemplate("templates/not-found.txt");
 			}());
 		}
 	}
@@ -70,7 +83,7 @@ BEGIN_TEST_SUITE("MarkdownRouteHandler Unit Tests")
 		SECTION("File exists")
 		{
 			REQUIRE_NOTHROW([&]() {
-				test_obj.LoadMarkdown("data/test.md");
+				test_obj.LoadMarkdown("content/test.md");
 			}());
 
 			REQUIRE(false == test_obj.GetMarkdownData().empty());
@@ -78,7 +91,7 @@ BEGIN_TEST_SUITE("MarkdownRouteHandler Unit Tests")
 		SECTION("File does not exists")
 		{
 			REQUIRE_THROWS([&]() {
-				test_obj.LoadMarkdown("not-found.txt");
+				test_obj.LoadMarkdown("content/not-found.txt");
 			}());
 		}
 	}
@@ -88,8 +101,8 @@ BEGIN_TEST_SUITE("MarkdownRouteHandler Unit Tests")
 		test_obj.OutputStream = buffer;
 
 		REQUIRE_NOTHROW([&]() {
-			test_obj.LoadTemplate("data/test.thtml");
-			test_obj.LoadMarkdown("data/test.md");
+			test_obj.LoadTemplate("templates/main.thtml");
+			test_obj.LoadMarkdown("content/test.md");
 
 			test_obj.Process("test", "test?param=1");
 		}());

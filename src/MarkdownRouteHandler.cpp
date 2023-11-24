@@ -18,15 +18,18 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <string>
 
 using namespace mdml;
 
 #if defined(TESTING)
-constexpr const char* DEFAULT_WORKDIR = ".";
+constexpr const char* DEFAULT_WORKDIR = "./data";
 #else
-constexpr const char* DEFAULT_WORKDIR = "/usr/local/www/templates";
+constexpr const char* DEFAULT_WORKDIR = "/usr/local/www";
 #endif
+
+fs::path MarkdownRouteHandler::work_dir = fs::absolute(DEFAULT_WORKDIR);
 
 const auto NOT_FOUND = std::string::npos;
 
@@ -48,7 +51,7 @@ string_replace(
 }
 
 MarkdownRouteHandler::MarkdownRouteHandler()
-    : IRouteHandler(), OutputStream(std::cout), work_dir(DEFAULT_WORKDIR)
+    : IRouteHandler(), OutputStream(std::cout)
 {
 	work_dir = fs::absolute(work_dir);
 }
@@ -56,17 +59,28 @@ MarkdownRouteHandler::MarkdownRouteHandler()
 MarkdownRouteHandler::~MarkdownRouteHandler() {}
 
 void
-MarkdownRouteHandler::LoadTemplate(const std::string& template_filename)
+MarkdownRouteHandler::LoadTemplate(const fs::path& template_filename)
 {
-	fs::path full_html_path = work_dir / template_filename;
+	fs::path full_html_path;
 
+	if (template_filename.is_relative()) {
+		full_html_path = work_dir / template_filename;
+	} else {
+		full_html_path = template_filename;
+	}
 	this->load_document(full_html_path, this->html_data);
 }
 
 void
-MarkdownRouteHandler::LoadMarkdown(const std::string& markdown_filename)
+MarkdownRouteHandler::LoadMarkdown(const fs::path& markdown_filename)
 {
-	fs::path full_md_path = work_dir / markdown_filename;
+	fs::path full_md_path;
+
+	if (markdown_filename.is_relative()) {
+		full_md_path = work_dir / markdown_filename;
+	} else {
+		full_md_path = markdown_filename;
+	}
 
 	this->load_document(full_md_path, this->markdown_data);
 }
@@ -82,6 +96,44 @@ MarkdownRouteHandler::Process(
 	out << document << std::flush;
 
 	return { NO_ERROR, document };
+}
+
+Dictionary<route::ptr<IRouteHandler>>
+MarkdownRouteHandler::GenerateRoutes(
+    std::filesystem::path content_dir, std::filesystem::path main_template
+)
+{
+	if (content_dir.is_relative()) {
+		content_dir = work_dir / content_dir;
+	}
+	Dictionary<route::ptr<IRouteHandler>> results;
+
+	for (const auto& entry :
+	     std::filesystem::directory_iterator(content_dir)) {
+		if (entry.is_regular_file()) {
+			auto filename = entry.path().filename().string();
+			auto routename = entry.path().stem().string();
+			auto extension = entry.path().extension().string();
+
+			// Check if the file has a .md extension and a specific
+			// name pattern
+			if (extension == ".md") {
+				auto& routeHandler =
+				    *(new MarkdownRouteHandler());
+
+				// Load template and document
+				routeHandler.LoadTemplate(
+				    (work_dir / main_template).string()
+				);
+				routeHandler.LoadMarkdown(entry.path().string());
+
+				// Move the routeHandler into the vector
+				results.emplace(routename, &routeHandler);
+			}
+		}
+	}
+
+	return results;
 }
 
 void

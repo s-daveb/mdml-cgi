@@ -11,6 +11,7 @@
 
 #include <functional>
 #include <map>
+#include <memory>
 #include <optional>
 #include <string>
 #include <utility>
@@ -19,6 +20,17 @@ namespace mdml {
 namespace c {
 using string = char*;
 using const_string = const char*;
+}
+
+namespace route {
+template<typename T>
+using ptr = std::shared_ptr<T>;
+template<typename T>
+inline static ptr<T>
+make_ptr()
+{
+	return std::make_shared<T>();
+}
 }
 
 enum error_t : bool { NO_ERROR = false, ERROR = true };

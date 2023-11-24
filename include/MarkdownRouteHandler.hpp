@@ -12,6 +12,7 @@
 #include "types.hpp"
 
 #include <filesystem>
+#include <map>
 #include <string>
 
 namespace mdml {
@@ -23,21 +24,34 @@ namespace fs = std::filesystem;
 class MarkdownRouteHandler : public IRouteHandler {
     public:
 	MarkdownRouteHandler();
+	MarkdownRouteHandler(const MarkdownRouteHandler& other) = default;
+	/*: IRouteHandler(other)
+	, html_data(other.html_data)
+	, markdown_data(other.markdown_data)
+	, OutputStream()
+    {
+    }*/
 	virtual ~MarkdownRouteHandler();
 
-	void LoadTemplate(const std::string& template_name);
-	void LoadMarkdown(const std::string& markdown_page_name);
+	void LoadTemplate(const fs::path& template_name);
+	void LoadMarkdown(const fs::path& markdown_page_name);
 
 	virtual Result<std::string> Process(
 	    const std::string& name, const std::string& request_uri
 	);
 
-	std::reference_wrapper<std::ostream> OutputStream;
-
 #ifdef TESTING
 	inline std::string& GetHtmlData() { return html_data; }
 	inline std::string& GetMarkdownData() { return markdown_data; }
 #endif
+
+	static Dictionary<route::ptr<IRouteHandler>> GenerateRoutes(
+	    std::filesystem::path content_dir,
+	    std::filesystem::path main_template
+	);
+
+	std::reference_wrapper<std::ostream> OutputStream;
+
     protected:
 	std::string render_document(
 	    const std::string& title, const std::string& request_uri
@@ -47,7 +61,7 @@ class MarkdownRouteHandler : public IRouteHandler {
 	    const fs::path& document_path, std::string& out_document
 	);
 
-	fs::path work_dir;
+	static fs::path work_dir;
 	std::string html_data;
 	std::string markdown_data;
 };

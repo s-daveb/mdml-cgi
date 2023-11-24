@@ -26,6 +26,21 @@ inline const char* simulated_launch::env[] = {
 	"REQUEST_URI=markdown?msg=hello-world",
 	nullptr
 };
+
+// Define a test oute handler for the "/markdown" route
+class ExampleRouteHandler : public mdml::IRouteHandler {
+    public:
+	virtual mdml::Result<std::string> Process(
+	    const std::string& name, const std::string& request_uri
+	) override
+	{
+		// Implement test logic for the route
+		// handler
+		return { mdml::NO_ERROR, "Processed" };
+	}
+	virtual ~ExampleRouteHandler() = default;
+};
+
 }
 
 BEGIN_TEST_SUITE("CgiApplication")
@@ -49,6 +64,26 @@ BEGIN_TEST_SUITE("CgiApplication")
 		);
 	};
 
+	TEST("CgiApplication RegisterRoutes Test")
+	{
+
+		CgiApplication test(
+		    1, simulated_launch::argv, simulated_launch::env
+		);
+
+		mdml::CgiApplication::RouteDictionary routes;
+		routes.emplace("test", new ExampleRouteHandler());
+		routes.emplace("test2", new ExampleRouteHandler());
+		routes.emplace("fasdfdshjk", new ExampleRouteHandler());
+
+		test.ImportRoutes(routes);
+
+		REQUIRE(routes.size() < 1);
+
+		REQUIRE(test.Routes.size() == 3);
+		REQUIRE(test.Routes.at("test") != nullptr);
+	};
+
 	TEST("CgiApplication::ProcessRequest no REQUEST_URI variable")
 	{
 		const char* no_request_env[] = { "PATH=/usr/bin",
@@ -62,23 +97,9 @@ BEGIN_TEST_SUITE("CgiApplication")
 
 	FIXTURE_TEST("CgiApplication ProcessRequest with valid route")
 	{
-		// Define a test oute handler for the "/markdown" route
-		class ExampleRouteHandler : public IRouteHandler {
-		    public:
-			virtual Result<std::string> Process(
-			    const std::string& name,
-			    const std::string& request_uri
-			) override
-			{
-				// Implement test logic for the route
-				// handler
-				return { mdml::NO_ERROR, "Processed" };
-			}
-			virtual ~ExampleRouteHandler() = default;
-		};
 
 		// Add the test route handler to the Routes dictionary
-		auto handler = CgiApplication::make_ptr<ExampleRouteHandler>();
+		auto handler = mdml::route::make_ptr<ExampleRouteHandler>();
 		cgi_app.Routes["markdown"] = handler;
 
 		auto result = cgi_app.ProcessRequest();
@@ -123,7 +144,7 @@ BEGIN_TEST_SUITE("CgiApplication")
 			}
 			virtual ~BadRouteHandler() = default;
 		};
-		auto handler = CgiApplication::make_ptr<BadRouteHandler>();
+		auto handler = mdml::route::make_ptr<BadRouteHandler>();
 		cgi_app.Routes["markdown"] = handler;
 
 		REQUIRE_THROWS_AS(

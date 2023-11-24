@@ -23,19 +23,17 @@ class IRouteHandler;
 class CgiApplication : public Application {
 
     public:
-	template<typename T>
-	using ptr = std::shared_ptr<T>;
-	template<typename T>
-	inline static ptr<T> make_ptr()
-	{
-		return std::make_shared<T>();
-	}
-	using RouteDictionary = std::map<std::string, ptr<IRouteHandler>>;
+	using RouteDictionary = Dictionary<route::ptr<IRouteHandler>>;
 
 	CgiApplication(int argc, c::const_string argv[], c::const_string env[]);
 	virtual ~CgiApplication();
 
 	Result<std::string> ProcessRequest();
+
+	inline void ImportRoutes(RouteDictionary& route_collection)
+	{
+		this->routes = std::move(route_collection);
+	}
 
 #ifdef TESTING
 	/* Expose a public reference to the Routes map, but only for unit-testing
