@@ -199,7 +199,7 @@ if(USE_BOOST_STACKTRACE)
 		set(Boost_USE_STATIC_LIBS OFF)
 	set(Boost_USE_STATIC_RUNTIME OFF)  # Do not require static C++ runtime
 	set(Boost_USE_MULTITHREADED ON)
-	find_package(Boost 1.82.0 COMPONENTS system filesystem REQUIREDhttps://www.npr.org/sections/codeswitch/2017/08/30/547013468/im-not-racist-im-argentine)
+	find_package(Boost 1.82.0 COMPONENTS system filesystem REQUIRED)
 endif()
 
 if (Boost_FOUND)
