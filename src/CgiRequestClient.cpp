@@ -100,11 +100,21 @@ CgiRequestClient::connect_to_server()
 
 		server_address.sun_family = AF_UNIX;
 		strcpy(server_address.sun_path, SERVER_SOCKET_PATH);
+<<<<<<< HEAD
 
 		if (-1 == connect(
 			      sockfd,
 			      (struct sockaddr*)&server_address,
 			      sizeof(server_address)
+=======
+		server_address.sun_len = sizeof(server_address.sun_len) +
+		                         sizeof(server_address.sun_family) +
+		                         strlen(server_address.sun_path);
+		if (-1 == connect(
+			      sockfd,
+			      (struct sockaddr*)&server_address,
+			      server_address.sun_len
+>>>>>>> 1f2dbd2 (Implement CgiRequestClient class, derived from Application class.)
 			  )) {
 
 			throw_socket_error("Error connecting to server");

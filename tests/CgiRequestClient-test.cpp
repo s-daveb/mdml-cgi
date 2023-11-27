@@ -62,6 +62,7 @@ struct test_server {
 		// Set up the sockaddr_un structure
 		socket_addr.sun_family = AF_UNIX;
 		strcpy(socket_addr.sun_path, mdml::TEST_SOCKET_PATH);
+
 		unlink(socket_addr.sun_path);
 		if (::bind(
 			server_socket,
