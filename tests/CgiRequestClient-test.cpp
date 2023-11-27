@@ -62,14 +62,11 @@ struct test_server {
 		// Set up the sockaddr_un structure
 		socket_addr.sun_family = AF_UNIX;
 		strcpy(socket_addr.sun_path, mdml::TEST_SOCKET_PATH);
-		socket_addr.sun_len = sizeof(socket_addr.sun_len) +
-		                      sizeof(socket_addr.sun_family) +
-		                      strlen(socket_addr.sun_path);
 		unlink(socket_addr.sun_path);
 		if (::bind(
 			server_socket,
 			(sockaddr*)&socket_addr,
-			socket_addr.sun_len
+			sizeof(socket_addr)
 		    ) == -1) {
 			throw mdml::exception("Error binding socket");
 		}
