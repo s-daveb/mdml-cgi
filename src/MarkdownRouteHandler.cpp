@@ -98,7 +98,7 @@ MarkdownRouteHandler::Process(
 	return { NO_ERROR, document };
 }
 
-Dictionary<route::ptr<IRouteHandler>>
+Dictionary<managed::ptr<IRouteHandler>>
 MarkdownRouteHandler::GenerateRoutes(
     std::filesystem::path content_dir, std::filesystem::path main_template
 )
@@ -106,7 +106,7 @@ MarkdownRouteHandler::GenerateRoutes(
 	if (content_dir.is_relative()) {
 		content_dir = work_dir / content_dir;
 	}
-	Dictionary<route::ptr<IRouteHandler>> results;
+	Dictionary<managed::ptr<IRouteHandler>> results;
 
 	for (const auto& entry :
 	     std::filesystem::directory_iterator(content_dir)) {

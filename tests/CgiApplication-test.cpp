@@ -99,7 +99,7 @@ BEGIN_TEST_SUITE("CgiApplication")
 	{
 
 		// Add the test route handler to the Routes dictionary
-		auto handler = mdml::route::make_ptr<ExampleRouteHandler>();
+		auto handler = mdml::managed::make_ptr<ExampleRouteHandler>();
 		cgi_app.Routes["markdown"] = handler;
 
 		auto result = cgi_app.ProcessRequest();
@@ -144,7 +144,7 @@ BEGIN_TEST_SUITE("CgiApplication")
 			}
 			virtual ~BadRouteHandler() = default;
 		};
-		auto handler = mdml::route::make_ptr<BadRouteHandler>();
+		auto handler = mdml::managed::make_ptr<BadRouteHandler>();
 		cgi_app.Routes["markdown"] = handler;
 
 		REQUIRE_THROWS_AS(

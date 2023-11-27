@@ -16,6 +16,8 @@
 
 namespace mdml {
 
+using EnvironmentDictionary = Dictionary<const std::string>;
+
 class Application {
     public:
 	Application(int argc, c::const_string argv[], c::const_string env[]);
@@ -31,7 +33,7 @@ class Application {
 	{
 		return this->arguments;
 	}
-	inline const Dictionary<const std::string>& Environment()
+	inline const EnvironmentDictionary& Environment()
 	{
 		return this->environment_variables;
 	}
@@ -50,7 +52,7 @@ class Application {
 	void create_env_dictionary(c::const_string envp[]);
 
 	std::vector<std::string> arguments;
-	Dictionary<const std::string> environment_variables;
+	EnvironmentDictionary environment_variables;
 };
 }
 

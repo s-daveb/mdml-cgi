@@ -22,7 +22,11 @@ using string = char*;
 using const_string = const char*;
 }
 
-namespace route {
+namespace fd {
+using socket = int;
+}
+
+namespace managed {
 template<typename T>
 using ptr = std::shared_ptr<T>;
 template<typename T>

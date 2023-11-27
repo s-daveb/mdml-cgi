@@ -23,7 +23,7 @@ class IRouteHandler;
 class CgiApplication : public Application {
 
     public:
-	using RouteDictionary = Dictionary<route::ptr<IRouteHandler>>;
+	using RouteDictionary = Dictionary<managed::ptr<IRouteHandler>>;
 
 	CgiApplication(int argc, c::const_string argv[], c::const_string env[]);
 	virtual ~CgiApplication();

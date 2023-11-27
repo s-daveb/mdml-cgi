@@ -45,7 +45,7 @@ class MarkdownRouteHandler : public IRouteHandler {
 	inline std::string& GetMarkdownData() { return markdown_data; }
 #endif
 
-	static Dictionary<route::ptr<IRouteHandler>> GenerateRoutes(
+	static Dictionary<managed::ptr<IRouteHandler>> GenerateRoutes(
 	    std::filesystem::path content_dir,
 	    std::filesystem::path main_template
 	);
