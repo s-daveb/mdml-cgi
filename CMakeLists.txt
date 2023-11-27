@@ -57,6 +57,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS On)
 include(FetchContent)
 include(CheckIncludeFile)
 
+find_package(Threads)
+
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(cmark libcmark)
 
