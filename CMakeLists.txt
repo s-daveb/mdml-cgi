@@ -76,6 +76,7 @@ if (USE_SYSTEM_CATCH2)
 endif()
 
 find_package(Threads)
+
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(cmark libcmark)
 
