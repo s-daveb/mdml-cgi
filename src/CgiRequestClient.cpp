@@ -8,7 +8,6 @@
  */
 
 #include "CgiRequestClient.hpp"
-#include "ICgiRequestHandler.hpp"
 #include "IRouteHandler.hpp"
 #include "exception.hpp"
 #include "types.hpp"
