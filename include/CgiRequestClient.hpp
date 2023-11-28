@@ -18,9 +18,6 @@
 
 namespace mdml {
 
-#ifdef TESTING
-constexpr c::const_string TEST_SOCKET_PATH = "/tmp/cgi-req-test.sock";
-#endif
 class IRouteHandler;
 
 class CgiRequestClient : public Application {

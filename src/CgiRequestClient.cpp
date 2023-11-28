@@ -26,6 +26,7 @@ using namespace mdml;
 constexpr size_t MAX_SOCKET_MSG_SIZE = 4 * 4096; // 16KiB
 
 #if defined(TESTING)
+#include "test-common.hpp"
 constexpr c::const_string SERVER_SOCKET_PATH = TEST_SOCKET_PATH;
 #else
 constexpr c::const_string SERVER_SOCKET_PATH = "/tmp/CgiRequestServer.sock";

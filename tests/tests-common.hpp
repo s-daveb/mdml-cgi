@@ -9,12 +9,11 @@
 
 #pragma once
 
-// Ignore warnings coming from the testing frameworks themselves
-// #pragma GCC diagnostic push
-// #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-// #pragma GCC diagnostic ignored "-Wzero-length-array"
 #include <catch2/catch_test_macros.hpp>
-// #pragma GCC diagnostic pop
+
+#ifdef TESTING
+constexpr const char* TEST_SOCKET_PATH = "/tmp/cgi-req-test.sock";
+#endif
 
 #pragma GCC diagnostic ignored "-Wunused-variable"
 #define BEGIN_TEST_SUITE(name)                                                  \
