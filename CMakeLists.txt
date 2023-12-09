@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.26)
 
 # Prevent in-source builds @
 if (CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR)
@@ -18,6 +18,11 @@ else()
 	option(ENABLE_TESTS "Build and run unit tests" OFF)
 endif()
 
+option(USE_SYSTEM_CATCH2
+	"Do not download & compile catch2 library for unit tests"
+	ON
+)
+
 if (UNIX AND NOT(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux"))
 	option(USE_BOOST_STACKTRACE "Use Boost::stacktrace for stack traces" OFF)
 	option(USE_EXECINFO_STACKTRACE "Use BSD/UNIX execinfo for stack traces" ON)
@@ -32,11 +37,11 @@ project(mdml
 	VERSION 0.1
 	LANGUAGES C CXX
 	# HOMEPAGE_URL
-	DESCRIPTION "A CGI script written in C++ that converts markdown to HTML"
+	DESCRIPTION "A CGIRelease script written in C++ that converts markdown to HTML"
 )
 
 IF( NOT CMAKE_BUILD_TYPE )
-   SET( CMAKE_BUILD_TYPE Release ... FORCE )
+   	SET( CMAKE_BUILD_TYPE Debug )
 ENDIF()
 
 set(CMAKE_CXX_STANDARD 17)
@@ -57,8 +62,20 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS On)
 include(FetchContent)
 include(CheckIncludeFile)
 
-find_package(Threads)
+if (USE_SYSTEM_CATCH2)
+	message(CHECK_START "Detecting System Catch2 ")
+	find_package(Catch2 3 QUIET)
 
+	if(TARGET Catch2::Catch2)
+		message(CHECK_PASS "found target Catch2::Catch2")
+	else()
+		message(CHECK_FAIL "not found")
+		set(USE_SYSTEM_CATCH2 OFF)
+		message(STATUS "USE_SYSTEM_CATCH2=OFF")
+	endif()
+endif()
+
+find_package(Threads)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(cmark libcmark)
 
@@ -66,29 +83,25 @@ if (cmark_FOUND)
 	set(USE_SYSTEM_CMARK True)
 endif()
 
-# @{ Enable unit testing framework only if needed 
-if(ENABLE_TESTS)
-	FetchContent_Declare(
-		Catch2
-		URL https://github.com/catchorg/Catch2/archive/refs/tags/v3.4.0.zip
-		URL_HASH MD5=c426e77d4ee0055410bc930182959ae5
-		FIND_PACKAGE_ARGS
-	)
-endif()
-# @}
-
-
-# @}
 
 # Avoid building Catch2 if unit tests aren't going to be built
 if (ENABLE_TESTS)
-	FetchContent_MakeAvailable(Catch2)
-	if (TARGET Catch2)
-		set_target_properties(Catch2 PROPERTIES CXX_STANDARD 17)
-	endif()
+	if (NOT USE_SYSTEM_CATCH2)
+		FetchContent_Declare(
+			Catch2
+			URL https://github.com/catchorg/Catch2/archive/refs/tags/v3.4.0.zip
+			URL_HASH MD5=c426e77d4ee0055410bc930182959ae5
+			FIND_PACKAGE_ARGS
+		)
 
-	if (TARGET Catch2WithMain)
-		set_target_properties(Catch2WithMain PROPERTIES CXX_STANDARD 17)
+		FetchContent_MakeAvailable(Catch2)
+		if (TARGET Catch2)
+			set_target_properties(Catch2 PROPERTIES CXX_STANDARD 17)
+		endif()
+
+		if (TARGET Catch2WithMain)
+			set_target_properties(Catch2WithMain PROPERTIES CXX_STANDARD 17)
+		endif()
 	endif()
 endif()
 
@@ -198,7 +211,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
 endif()
 
 if(USE_BOOST_STACKTRACE)
-		set(Boost_USE_STATIC_LIBS OFF)
+	set(Boost_USE_STATIC_LIBS OFF)
 	set(Boost_USE_STATIC_RUNTIME OFF)  # Do not require static C++ runtime
 	set(Boost_USE_MULTITHREADED ON)
 	find_package(Boost 1.82.0 COMPONENTS system filesystem REQUIRED)
@@ -221,14 +234,6 @@ add_subdirectory(apps)
 
 if (ENABLE_TESTS)
 	add_subdirectory(tests)
-
-	add_custom_target(ctest
-		COMMAND ctest -C $CONFIGURATION --test-dir ./tests --output-on-failure
-	)
-	add_dependencies(ctest
-		mdml-tests
-		copy_assets
-	)
 
 endif()
 
