@@ -37,7 +37,7 @@ project(mdml
 	VERSION 0.1
 	LANGUAGES C CXX
 	# HOMEPAGE_URL
-	DESCRIPTION "A CGIRelease script written in C++ that converts markdown to HTML"
+	DESCRIPTION "A CGI script written in C++ that converts markdown to HTML"
 )
 
 IF( NOT CMAKE_BUILD_TYPE )
