@@ -15,6 +15,8 @@ if (USE_SYSTEM_CMARK)
 	set(LIBMDML_LINK_LIBS ${LIBMDML_LINK_LIBS} ${cmark_LIBRARIES} Threads::Threads )
 endif()
 
+list(REMOVE_DUPLICATES LIBMDML_LINK_LIBS)
+
 add_library(mdml SHARED ${LIBMDML_SOURCES})
 add_library(mdml_static STATIC ${LIBMDML_SOURCES})
 add_library(mdml_test STATIC ${LIBMDML_SOURCES})
