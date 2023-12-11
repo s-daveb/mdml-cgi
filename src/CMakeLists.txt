@@ -7,7 +7,7 @@ set(LIBMDML_SOURCES
 	CgiApplication.cpp
 	MarkdownRouteHandler.cpp
 	CgiRequestClient.cpp
-	CgiRequestHandler.cpp
+	#CgiRequestHandler.cpp
 )
 
 set(LIBMDML_LINK_LIBS ${LIBMDML_LINK_LIBS} ${STACKTRACE_DEP_LIBS} )
