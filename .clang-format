@@ -1,25 +1,25 @@
 ---
-BasedOnStyle: Mozilla
+BasedOnStyle: LLVM 
 Language: Cpp
 
-IndentWidth: 8
+IndentWidth: 4
 UseTab: AlignWithSpaces
-ColumnLimit: 81
-AccessModifierOffset: -4
-BinPackParameters: true
-AlwaysBreakAfterDefinitionReturnType: TopLevel
+ColumnLimit: 80
+AccessModifierOffset: -2
 AlwaysBreakAfterReturnType: None
+BinPackArguments: true
+BinPackParameters: true
 ContinuationIndentWidth: 4
-ConstructorInitializerAllOnOneLineOrOnePerLine: true
 ConstructorInitializerIndentWidth: 4
+PackConstructorInitializers: CurrentLine
 AllowAllArgumentsOnNextLine: true
-AlignAfterOpenBracket: BlockIndent
+AlignAfterOpenBracket: Align
 
-BreakBeforeBraces:  WebKit
+#BreakBeforeBraces: Custom
 #BraceWrapping:
 #  AfterCaseLabel:  false
 #  AfterClass:      true
-#  AfterControlStatement:  MultiLine
+#  AfterControlStatement: Always
 #  AfterEnum:       false
 #  AfterFunction:   true
 #  AfterNamespace:  false
@@ -36,5 +36,4 @@ BreakBeforeBraces:  WebKit
 #  SplitEmptyFunction: true
 #  SplitEmptyRecord: false
 #  SplitEmptyNamespace: true
-#
 ---

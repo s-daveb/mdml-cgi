@@ -7,6 +7,7 @@ set(LIBMDML_SOURCES
 	CgiApplication.cpp
 	MarkdownRouteHandler.cpp
 	CgiRequestClient.cpp
+	CgiRequestHandler.cpp
 )
 
 set(LIBMDML_LINK_LIBS ${LIBMDML_LINK_LIBS} ${STACKTRACE_DEP_LIBS} )
@@ -17,9 +18,12 @@ endif()
 
 list(REMOVE_DUPLICATES LIBMDML_LINK_LIBS)
 
+
 add_library(mdml SHARED ${LIBMDML_SOURCES})
 add_library(mdml_static STATIC ${LIBMDML_SOURCES})
 add_library(mdml_test STATIC ${LIBMDML_SOURCES})
+
+target_compile_definitions(mdml_test PUBLIC -DTEST_SOCKET_PATH="/tmp/cgi-req-test.sock")
 
 target_compile_options(mdml PRIVATE ${CMAKE_CXX_FLAGS})
 target_compile_options(mdml_static PRIVATE ${CMAKE_CXX_FLAGS})

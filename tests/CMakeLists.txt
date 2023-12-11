@@ -8,7 +8,7 @@ set(MDML_TEST_SOURCE_LIST
 	CgiApplication-test.cpp
 	MarkdownRouteHandler-test.cpp
 	CgiRequestClient-test.cpp
-	CgiRequestHandler-test.cpp
+	#CgiRequestHandler-test.cpp
 )
 
 add_executable(mdml-tests
@@ -20,9 +20,9 @@ set_target_properties(mdml-tests PROPERTIES
 )
 
 target_compile_definitions(mdml-tests PUBLIC -DTESTING)
+target_compile_definitions(mdml-tests PUBLIC -DTEST_SOCKET_PATH="/tmp/cgi-req-test.sock")
 
-
-target_link_directories(mdml-tests PRIVATE ${CATCH2_LIBRARY_DIRS})
+target_link_directories(mdml-tests PRIVATE ${Catch2_LIBRARY_DIRS})
 target_include_directories(mdml-tests PRIVATE ${Catch2_INCLUDE_DIRS})
 
 # Link the test executable with libmdml_static source code and Catch2

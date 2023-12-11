@@ -11,24 +11,20 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#ifdef TESTING
-constexpr const char* TEST_SOCKET_PATH = "/tmp/cgi-req-test.sock";
-#endif
-
 #pragma GCC diagnostic ignored "-Wunused-variable"
-#define BEGIN_TEST_SUITE(name)                                                  \
-	static const char* TEST_SUITE_NAME = "[" name "]";                      \
-	namespace
+#define BEGIN_TEST_SUITE(name)                                                 \
+    static const char *TEST_SUITE_NAME = "[" name "]";                         \
+    namespace
 
 #define TEST(testname) TEST_CASE(testname, TEST_SUITE_NAME)
 
-#define TEST_WITH_FIXTURE(FixtureName, testname)                                \
-	TEST_CASE_METHOD(FixtureName, testname, TEST_SUITE_NAME)
+#define TEST_WITH_FIXTURE(FixtureName, testname)                               \
+    TEST_CASE_METHOD(FixtureName, testname, TEST_SUITE_NAME)
 
 #define FIXTURE_TEST(testname) TEST_WITH_FIXTURE(TestFixture, testname)
 
 #ifdef VIM_COMPLETION
-#define UNIT_TEST 1
+#define TESTING 1
 #endif
 
 // clang-format off

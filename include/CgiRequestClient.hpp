@@ -12,28 +12,26 @@
 #include "Application.hpp"
 #include "types.hpp"
 
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <vector>
 
 namespace mdml {
 
-class IRouteHandler;
-
 class CgiRequestClient : public Application {
+  public:
+    CgiRequestClient(int argc, c::const_string argv[], c::const_string env[]);
+    virtual ~CgiRequestClient();
+    Result<std::string> ProcessRequest();
 
-    public:
-	CgiRequestClient(
-	    int argc, c::const_string argv[], c::const_string env[]
-	);
-	virtual ~CgiRequestClient();
-	Result<std::string> ProcessRequest();
+    const fs::path SocketPath();
 
-    private:
-	void connect_to_server();
-	std::string query_server(const std::string& query);
-	fd::socket server_socket;
+  private:
+    void connect_to_server();
+    std::string query_server(const std::string &query);
+    fd::socket server_socket;
 };
-}
-// clang-format off
+} // namespace mdml
+  // clang-format off
 // vim: set foldmethod=marker foldmarker=#region,#endregion textwidth=81 ts=8 sts=0 sw=8  noexpandtab ft=cpp.doxygen :

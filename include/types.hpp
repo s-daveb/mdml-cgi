@@ -18,43 +18,39 @@
 
 namespace mdml {
 namespace c {
-using string = char*;
-using const_string = const char*;
-}
+using string = char *;
+using const_string = const char *;
+} // namespace c
+
+namespace fs = std::filesystem;
 
 namespace fd {
 using socket = int;
 }
 
 namespace managed {
-template<typename T>
-using ptr = std::shared_ptr<T>;
-template<typename T>
-inline static ptr<T>
-make_ptr()
-{
-	return std::make_shared<T>();
+template <typename T> using ptr = std::shared_ptr<T>;
+template <typename T> inline static ptr<T> make_ptr() {
+    return std::make_shared<T>();
 }
-}
+} // namespace managed
 
 enum error_t : bool { NO_ERROR = false, ERROR = true };
 using count_t = size_t;
 
-template<typename T>
-using reference = std::reference_wrapper<T>;
+template <typename T> using reference = std::reference_wrapper<T>;
 
-template<typename T>
+template <typename T>
 using optional_reference = std::optional<std::reference_wrapper<T>>;
 
-template<typename T>
-using const_reference = std::reference_wrapper<const T>;
+template <typename T> using const_reference = std::reference_wrapper<const T>;
 
-template<typename T>
+template <typename T>
 using opt_const_reference = std::optional<const_reference<const T>>;
 
-template<typename value_t>
+template <typename value_t>
 using Dictionary = std::map<const std::string, value_t>;
-}
+} // namespace mdml
 
 #include "types/Result.hpp"
 
